@@ -1,0 +1,1003 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>PixelProof: photo checks for Shopify claims</title>
+<script src="./vendor/react.js"></script>
+<script src="./vendor/react-dom.js"></script>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300..700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#ECEDEA}
+a{color:#121A15}a:hover{color:#18844F}
+.pp *{box-sizing:border-box}
+.pp :focus-visible{outline:2px solid #2D5BE3;outline-offset:2px;border-radius:8px}
+@media (max-width:860px){.pp-navlinks{display:none!important}.pp-side{display:none!important}}
+.ppi-mail{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;align-items:baseline;padding:9px 0;font-size:12.5px;border-top:1px solid #E3E6E1}
+.ppi-mail:first-child{border-top:0}
+.ppi-who{font-weight:500;white-space:nowrap}.ppi-you{color:#5F6862;font-weight:400}
+.ppi-txt{color:#4E5852;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ppi-t{color:#5F6862;font-size:11.5px;white-space:nowrap}
+.ppi-ok{display:flex;align-items:center;gap:7px;min-width:0}
+.ppi-ok::before{content:"\2713";flex:none;width:16px;height:16px;border-radius:50%;background:#18844F;color:#fff;font-size:10px;font-weight:700;line-height:16px;text-align:center}
+.ppa-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:40px;align-items:center}
+.ppa-copy{display:flex;flex-direction:column;gap:18px}
+.ppa-eyebrow{align-self:flex-start;display:inline-flex;align-items:center;gap:8px;height:30px;padding:0 12px;border-radius:20px;background:#fff;font-size:13px;font-weight:500;color:#14633B;box-shadow:0 1px 2px rgba(18,26,21,.04)}
+.ppa-dot{width:7px;height:7px;border-radius:50%;background:#18844F}
+.ppa-opts{display:grid;gap:8px;margin-top:6px}
+.ppa-opt{all:unset;box-sizing:border-box;display:grid;grid-template-columns:34px 1fr;gap:12px;align-items:center;padding:12px 14px;border-radius:14px;background:#fff;border:1.5px solid transparent;cursor:pointer;transition:border-color .15s;box-shadow:0 1px 2px rgba(18,26,21,.04)}
+.ppa-opt:hover{border-color:#C9CEC8}
+.ppa-opt[aria-pressed="true"]{border-color:#121A15}
+.ppa-ic{width:34px;height:34px;border-radius:50%;background:#E4F3EA;color:#18844F;display:grid;place-items:center}
+.ppa-opt b{display:block;font-weight:500;font-size:15px}.ppa-opt small{display:block;color:#5F6862;font-size:13px;line-height:1.4}
+.ppa-stage{position:relative;border-radius:24px;overflow:hidden;min-height:620px;display:grid;place-items:center;padding:48px 24px;background:#ECEDEA}
+.ppa-bg{position:absolute;inset:-20px;width:calc(100% + 40px);height:calc(100% + 40px);object-fit:cover;object-position:left top;filter:blur(5px)}
+.ppa-scrim{position:absolute;inset:0;background:rgba(18,26,21,.32)}
+.ppa-modal{position:relative;width:min(440px,100%);aspect-ratio:880/1062;border-radius:22px;overflow:hidden;background:#fff;box-shadow:0 30px 70px rgba(6,20,13,.35),0 6px 16px rgba(6,20,13,.18)}
+.ppa-modal img{position:absolute;inset:0;width:100%;height:100%;display:block;transition:opacity .35s ease}
+.pph-grid{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:28px;align-items:start}
+.pph-steps{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.pph-step{all:unset;box-sizing:border-box;width:100%;display:grid;grid-template-columns:30px 1fr;gap:12px;padding:14px 16px;border-radius:16px;cursor:pointer;transition:background .2s,box-shadow .2s}
+.pph-step:hover{background:rgba(255,255,255,.55)}
+.pph-step[aria-pressed="true"]{background:#fff;box-shadow:0 1px 2px rgba(18,26,21,.06),0 8px 24px -12px rgba(18,26,21,.18)}
+.pph-n{width:30px;height:30px;border-radius:50%;background:#E3E6E1;color:#4E5852;display:grid;place-items:center;font-size:13px;font-weight:600;transition:background .2s,color .2s}
+.pph-step[aria-pressed="true"] .pph-n{background:#14231A;color:#fff}
+.pph-step b{display:block;font-weight:500;font-size:15.5px}.pph-step small{display:block;color:#5F6862;font-size:13.5px;line-height:1.45;margin-top:2px}
+.pph-view{background:#fff;border-radius:22px;padding:14px;box-shadow:0 1px 2px rgba(18,26,21,.04)}
+.pph-track{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:4px 4px 14px}
+.pph-st{display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:20px;border:1px solid;font-size:13px;font-weight:500;transition:background .3s,color .3s,border-color .3s}
+.pph-st i{width:7px;height:7px;border-radius:50%;display:block;transition:background .3s}
+.pph-arr{color:#B9BFBA;flex:none}
+.pph-shot{position:relative;aspect-ratio:2380/2020;border-radius:14px;overflow:hidden;background:#ECEDEA}
+.pph-shot img{position:absolute;left:0;top:0;width:100%;height:auto;display:block;transition:opacity .45s ease}
+@media (max-width:900px){.ppa-grid,.pph-grid{grid-template-columns:minmax(0,1fr)}.ppa-stage{min-height:0;padding:28px 16px}}
+@media (max-width:480px){.pph-track{gap:5px}.pph-st{height:26px;padding:0 9px;font-size:12px}.pph-arr{width:12px;height:12px}}
+@media (prefers-reduced-motion:reduce){.ppa-modal img,.pph-shot img,.pph-st,.pph-st i,.pph-step,.pph-n{transition:none!important}}
+.pps-ov{display:grid;gap:12px;grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a b b" "d e c"}
+.pps-a{grid-area:a}.pps-b{grid-area:b;container-type:inline-size}.pps-c{grid-area:c}.pps-d{grid-area:d}.pps-e{grid-area:e}
+.pps-split{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px;padding-top:14px;border-top:1px solid #E3E6E1}
+.pps-row{display:flex;flex-direction:column;gap:6px;min-width:0}
+.pps-sw{width:22px;height:5px;border-radius:3px}
+.pps-v b{display:block;font-size:17px;font-weight:500;letter-spacing:-.02em}.pps-v small,.pps-l small{display:block;font-size:11px;color:#5F6862;line-height:1.35}
+.pps-l b{display:block;font-size:12px;font-weight:500;line-height:1.3}
+@container (max-width:520px){.pps-split{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:1100px){.pps-ov{grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-areas:"a c" "b b" "d e"}}
+@media (max-width:720px){.pps-ov{grid-template-columns:minmax(0,1fr);grid-template-areas:"a" "b" "c" "d" "e"}}
+.ppn-burger{display:none}
+@media (max-width:860px){.ppn-burger{display:grid}}
+.ppn-logo{animation:ppn-pop .3s ease both;transition:transform .3s}
+a:hover .ppn-logo{transform:rotate(10deg)}
+@keyframes ppn-pop{from{transform:scale(.8)}to{transform:scale(1)}}
+.ppn-link{display:inline-block;animation:ppn-down .3s ease both;animation-delay:var(--d,0ms);transition:transform .2s,color .2s}
+.pp .ppn-link:hover{transform:scale(1.05);color:#4E5852!important}
+@keyframes ppn-down{from{opacity:0;transform:translateY(-10px)}to{opacity:1;transform:none}}
+.ppn-cta{animation:ppn-in .3s ease .2s both;transition:transform .2s,background .2s}
+.pp .ppn-cta:hover{transform:scale(1.05);background:#000!important;color:#fff!important}
+@keyframes ppn-in{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+.ppn-burger:active{transform:scale(.9)}
+.ppn-sheet{animation:ppn-slide .45s cubic-bezier(.2,.9,.3,1.05) both}
+@keyframes ppn-slide{from{opacity:0;transform:translateX(100%)}to{opacity:1;transform:none}}
+.ppn-item{animation:ppn-item .35s ease both;animation-delay:var(--d,0ms)}
+@keyframes ppn-item{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@media (prefers-reduced-motion:reduce){.ppn-logo,.ppn-link,.ppn-cta,.ppn-sheet,.ppn-item{animation:none}}
+.ppv-bg{position:absolute;top:0;left:0;right:0;bottom:300px;z-index:0;overflow:hidden;pointer-events:none;-webkit-mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 220px),transparent 100%);mask-image:linear-gradient(to bottom,#000 0,#000 calc(100% - 220px),transparent 100%);background:radial-gradient(70% 60% at 50% 40%,#1C553A 0%,#0F2D1E 45%,#06140D 100%)}
+.ppv-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+@media (max-width:640px){.ppv-bg{bottom:200px}}
+.ppx-spin{animation:ppx-spin 3s linear infinite}
+@keyframes ppx-spin{to{transform:rotate(360deg)}}
+.ppx-chev{transition:transform .3s}
+.pp .ppx-pill:hover{color:#fff!important}
+.pp .ppv-link:hover{color:#CFEBDC!important}
+.ppx-pill:hover .ppx-chev{transform:translateX(4px)}
+.ppx-cta{transition:background .2s}
+.pp .ppx-cta:hover{color:#121A15;background:linear-gradient(to top right,rgba(205,210,203,.3),rgba(63,191,122,.26),rgba(255,255,255,0)),#fff!important}
+@media (prefers-reduced-motion:reduce){.ppx-spin{animation:none}}
+.fcb-banner{--cta-pad-y:clamp(1.25rem,8cqh,3.75rem);--cta-pad-x:clamp(1.25rem,4.5cqw,3.5rem);--cta-gap:clamp(.55rem,2.6cqh,1.05rem);--cta-heading:clamp(1.6rem,4.3cqw + 1.2cqh,3.6rem);--cta-body:clamp(.9rem,1.3cqw + .5cqh,1.1rem);position:relative;isolation:isolate;container-type:size;overflow:hidden;display:flex;align-items:flex-end;width:100%;aspect-ratio:2.4/1;min-height:fit-content;padding:var(--cta-pad-y) var(--cta-pad-x);border-radius:28px;color:#F4F7F4;background:radial-gradient(80% 90% at 0% 0%,#0B2418 0%,rgba(11,36,24,0) 70%),linear-gradient(158deg,#0F2D1E 0%,#1C553A 55%,#4F8A68 100%);box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 30px 60px -30px rgba(20,35,26,.55)}
+.fcb-blinds{position:absolute;inset:0;z-index:0;border-radius:inherit;overflow:hidden}
+.fcb-canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
+.fcb-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;border-radius:inherit;background:linear-gradient(105deg,rgba(5,14,9,.5) 0%,rgba(5,14,9,.18) 50%,rgba(5,14,9,0) 100%)}
+.fcb-copy{position:relative;z-index:2;width:min(100%,42rem);max-width:64cqw;display:grid;gap:var(--cta-gap);pointer-events:none}
+.fcb-copy a{pointer-events:auto}
+.fcb-eyebrow{display:inline-flex;align-items:center;gap:.7rem;margin:0;font-size:13px;font-weight:500;letter-spacing:.01em;color:rgba(244,247,244,.74)}
+.fcb-rule{width:clamp(1rem,3cqw,1.6rem);height:1px;background:#3FBF7A}
+.fcb-heading{margin:0;max-width:22ch;font-size:var(--cta-heading);font-weight:400;line-height:1.04;letter-spacing:-.03em;color:#F4F7F4;text-wrap:balance}
+.fcb-body{margin:0;max-width:42ch;font-size:var(--cta-body);line-height:1.5;color:rgba(244,247,244,.8)}
+.fcb-actions{display:flex;flex-wrap:wrap;align-items:center;gap:.6rem 1.2rem;margin-top:clamp(.2rem,1.5cqh,.6rem)}
+.fcb-primary{display:inline-flex;align-items:center;gap:8px;height:48px;padding:0 22px;border-radius:14px;background:#fff;color:#121A15;font-size:15.5px;font-weight:500;text-decoration:none;box-shadow:0 10px 28px -12px rgba(0,0,0,.45);transition:background .16s ease,transform .16s ease}
+.fcb-primary:hover{background:#E4F3EA;color:#121A15;transform:translateY(-1px)}
+.fcb-primary:focus-visible,.fcb-secondary:focus-visible{outline:2px solid #A9D6BC;outline-offset:3px}
+.fcb-secondary{display:inline-flex;align-items:center;padding:8px 4px;color:rgba(244,247,244,.84);font-size:15px;font-weight:500;text-decoration:underline;text-decoration-color:rgba(244,247,244,.3);text-underline-offset:.28em;transition:color .16s ease}
+.fcb-secondary:hover{color:#fff;text-decoration-color:rgba(244,247,244,.6)}
+@container (max-height:22rem){.fcb-body{line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}}
+@container (max-height:16rem){.fcb-eyebrow{display:none}.fcb-body{-webkit-line-clamp:1}.fcb-actions{margin-top:0}}
+@media (max-width:640px){.fcb-banner{border-radius:20px;aspect-ratio:auto;min-height:26rem;container-type:inline-size;--cta-heading:clamp(1.9rem,8vw,2.4rem);--cta-body:1rem;--cta-pad-y:2rem;--cta-pad-x:1.35rem;--cta-gap:.9rem}.fcb-copy{max-width:none}.fcb-actions{flex-direction:column;align-items:flex-start}}
+@media (prefers-reduced-motion:reduce){.fcb-primary{transition:none}.fcb-primary:hover{transform:none}}
+.bwf{--bwf-bg:#06140D;--bwf-bg-rgb:6,20,13;--bwf-ink:#EEF3EF;--bwf-ink-rgb:238,243,239;--bwf-muted:#9AAAA1;--bwf-acc:63,191,122;--bwf-lit:150,224,182;--bwf-wt:#1F5C3C;--bwf-wf:#06140D;--bwf-ang:118deg;--bwf-b:58%;--bwf-px:50%;--bwf-py:50%;--bwf-g:0;--bwf-top:0px;--bwf-bot:100%;position:relative;isolation:isolate;overflow:hidden;container-type:inline-size;background:var(--bwf-bg);color:var(--bwf-ink);touch-action:pan-y}
+.bwf a{color:inherit;text-decoration:none}
+.bwf ul{list-style:none;margin:0;padding:0}
+.bwf p{margin:0}
+.bwf svg{max-width:none;display:block}
+.bwf-sr{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+.bwf-rule{position:absolute;left:0;right:0;top:0;height:1px;z-index:3;background:linear-gradient(90deg,rgba(var(--bwf-acc),.15),rgba(var(--bwf-acc),.55) var(--bwf-b),rgba(var(--bwf-acc),.15))}
+.bwf-sky{position:absolute;inset:0;z-index:0;pointer-events:none;overflow:hidden;background:radial-gradient(80% 90% at 0% 0%,#0B2418 0%,rgba(11,36,24,0) 70%),linear-gradient(158deg,#0F2D1E 0%,#1C553A 55%,#4F8A68 100%)}
+.bwf-scrim{position:absolute;inset:0;z-index:1;pointer-events:none;background:linear-gradient(105deg,rgba(5,14,9,.55) 0%,rgba(5,14,9,.25) 50%,rgba(5,14,9,.05) 100%)}
+.bwf-inner{position:relative;z-index:2;max-width:1200px;margin:0 auto;padding:clamp(48px,8.5cqw,104px) 24px 0;display:grid;grid-template-columns:minmax(0,1.62fr) minmax(0,.86fr) minmax(0,.86fr);column-gap:clamp(24px,4cqw,48px);row-gap:44px}
+.bwf-label{font-size:12.5px;line-height:1;letter-spacing:.01em;color:rgb(var(--bwf-acc));padding-bottom:13px;position:relative;display:block}
+.bwf-label::after{content:'';position:absolute;left:0;right:0;bottom:0;height:1px;background:linear-gradient(90deg,rgba(var(--bwf-acc),.55),rgba(var(--bwf-acc),.28))}
+.bwf-col{min-width:0}
+.bwf-col:nth-child(1){max-width:420px}
+.bwf-credits{margin-top:21px;font-size:14.5px;line-height:1.55;color:var(--bwf-muted)}
+.bwf-credits p+p{margin-top:4px}
+.bwf-credits .bwf-legal{margin-top:18px;font-size:13.5px}
+.bwf-credits b{font-weight:400;color:var(--bwf-ink)}
+.bwf-credits a{color:var(--bwf-ink);background:linear-gradient(rgb(var(--bwf-acc)),rgb(var(--bwf-acc))) 0 100%/0 1px no-repeat;transition:background-size .35s cubic-bezier(.2,.8,.2,1),color .25s}
+.bwf-credits a:hover,.bwf-credits a:focus-visible{background-size:100% 1px;color:#fff;outline:none}
+.bwf-links{margin-top:13px;display:flex;flex-direction:column}
+.bwf-link{position:relative;display:inline-flex;align-items:center;gap:8px;padding:6px 0;font-size:15px;line-height:21px;color:rgba(var(--bwf-ink-rgb),.8);transition:color .25s}
+.bwf-link-t{display:inline-block;transition:translate .35s cubic-bezier(.2,.8,.2,1)}
+.bwf-link::before{content:'';position:absolute;left:0;top:50%;width:6px;height:1px;background:rgb(var(--bwf-acc));transform:scaleX(0);transform-origin:0 50%;transition:transform .35s cubic-bezier(.2,.8,.2,1)}
+.bwf-link svg{width:12px;height:12px;opacity:0;translate:-6px 0;color:rgb(var(--bwf-acc));transition:opacity .25s,translate .35s cubic-bezier(.2,.8,.2,1)}
+.bwf .bwf-link:hover,.bwf .bwf-link:focus-visible{color:#fff;outline:none}
+.bwf-link:hover::before,.bwf-link:focus-visible::before{transform:scaleX(1)}
+.bwf-link:hover .bwf-link-t,.bwf-link:focus-visible .bwf-link-t{translate:12px 0}
+.bwf-link:hover svg,.bwf-link:focus-visible svg{opacity:1;translate:10px 0}
+.bwf-link:focus-visible .bwf-link-t{text-decoration:underline;text-underline-offset:4px;text-decoration-color:rgba(var(--bwf-acc),.8)}
+.bwf-word{position:relative;z-index:1;overflow:hidden;margin-top:clamp(28px,7cqw,96px);height:calc(.94 * 26cqw)}
+.bwf-word-box{padding:0 24px;max-width:1200px;margin:0 auto}
+.bwf-word-in{display:inline-flex;white-space:nowrap;font-weight:500;line-height:1;letter-spacing:-.045em;user-select:none;-webkit-user-select:none;font-size:26cqw}
+.bwf-lw{display:inline-block}
+.bwf-l{display:inline-block;cursor:pointer;color:transparent;-webkit-background-clip:text;background-clip:text;background-repeat:no-repeat;background-size:var(--bwf-rw,100cqw) var(--bwf-rh,100%);background-position:calc(var(--bwf-x,0px) * -1) calc(var(--bwf-y,0px) * -1);background-image:radial-gradient(circle 22cqw at var(--bwf-px) var(--bwf-py),rgba(var(--bwf-lit),calc(var(--bwf-g) * .85)),transparent 70%),linear-gradient(var(--bwf-ang),transparent calc(var(--bwf-b) - 9%),rgba(var(--bwf-lit),.55) calc(var(--bwf-b) - 1.5%),rgba(var(--bwf-lit),.7) var(--bwf-b),rgba(var(--bwf-lit),.2) calc(var(--bwf-b) + 3.5%),transparent calc(var(--bwf-b) + 8%)),linear-gradient(180deg,var(--bwf-wt) var(--bwf-top),var(--bwf-wf) var(--bwf-bot));transition:transform .5s cubic-bezier(.2,.9,.25,1.2),filter .4s;transform-origin:50% 100%}
+.bwf-l:hover{transform:translateY(-.045em);filter:brightness(1.35) saturate(1.1)}
+.bwf-l.is-hop{animation:bwf-hop .75s cubic-bezier(.2,.8,.2,1)}
+@keyframes bwf-hop{0%{transform:translateY(0) scale(1,1)}18%{transform:translateY(.02em) scale(1.06,.9)}45%{transform:translateY(-.14em) scale(.97,1.05)}70%{transform:translateY(.01em) scale(1.02,.97)}100%{transform:translateY(-.045em) scale(1,1)}}
+.bwf-foot{position:absolute;left:0;right:0;bottom:0;height:34%;z-index:2;pointer-events:none;background:linear-gradient(180deg,transparent,rgba(var(--bwf-bg-rgb),.55) 55%,var(--bwf-bg))}
+@container (max-width:760px){.bwf-inner{grid-template-columns:minmax(0,1fr) minmax(0,1fr);row-gap:40px}.bwf-col:nth-child(1){grid-column:1 / -1;max-width:none}}
+@media (prefers-reduced-motion:reduce){.bwf .bwf-l,.bwf .bwf-link-t,.bwf .bwf-link svg{transition:none!important;animation:none!important}}
+</style>
+</helmet>
+<div class="pp" style="font-family: Outfit, system-ui, -apple-system, 'Segoe UI', sans-serif; font-size: 15px; line-height: 1.5; color: #121A15; background: #ECEDEA; -webkit-font-smoothing: antialiased; overflow-x: hidden">
+
+<!-- NAV -->
+<header style="position: sticky; top: 0; z-index: 30; display: flex; justify-content: center; padding: 16px 16px 0; margin-bottom: -72px; pointer-events: none">
+<div class="ppn-bar" style="pointer-events: auto; position: relative; width: 100%; max-width: 820px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 8px 8px 8px 14px; border-radius: 999px; background: rgba(255,255,255,.92); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); box-shadow: 0 10px 30px -12px rgba(20,35,26,.28), 0 1px 2px rgba(18,26,21,.06)">
+<a href="#top" aria-label="PixelProof home" style="display: flex; align-items: center; gap: 9px; text-decoration: none; color: #121A15">
+<span class="ppn-logo" style="width: 32px; height: 32px; border-radius: 50%; background: #1A3C2A; color: #fff; display: grid; place-items: center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg></span>
+<span style="font-size: 16px; font-weight: 600; letter-spacing: -.01em">PixelProof</span>
+</a>
+<nav class="pp-navlinks" aria-label="Main" style="display: flex; align-items: center; gap: 26px">
+<a href="#how" class="ppn-link" style="--d: 0ms; font-size: 14px; font-weight: 500; text-decoration: none; color: #121A15">How it works</a>
+<a href="#checks" class="ppn-link" style="--d: 50ms; font-size: 14px; font-weight: 500; text-decoration: none; color: #121A15">Photo checks</a>
+<a href="#pricing" class="ppn-link" style="--d: 100ms; font-size: 14px; font-weight: 500; text-decoration: none; color: #121A15">Pricing</a>
+<a href="#faq" class="ppn-link" style="--d: 150ms; font-size: 14px; font-weight: 500; text-decoration: none; color: #121A15">FAQ</a>
+</nav>
+<a href="https://apps.shopify.com/reklamation" class="pp-navlinks ppn-cta" style="display: inline-flex; align-items: center; justify-content: center; height: 40px; padding: 0 20px; border-radius: 999px; background: #14231A; color: #fff; text-decoration: none; font-size: 14px; font-weight: 500; white-space: nowrap">Add to Shopify</a>
+<button type="button" class="ppn-burger" onClick="{{openMenu}}" aria-label="Open menu" aria-expanded="{{menuExpanded}}" style="width: 44px; height: 44px; border: 0; border-radius: 50%; background: transparent; color: #121A15; cursor: pointer; place-items: center"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"></path></svg></button>
+</div>
+<sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+<div class="ppn-sheet" role="dialog" aria-modal="true" aria-label="Menu" style="pointer-events: auto; position: fixed; inset: 0; z-index: 50; background: #fff; padding: 96px 24px 32px; display: flex; flex-direction: column; gap: 22px">
+<button type="button" onClick="{{closeMenu}}" aria-label="Close menu" style="position: absolute; top: 20px; right: 20px; width: 44px; height: 44px; border: 0; border-radius: 50%; background: #F4F5F2; color: #121A15; cursor: pointer; display: grid; place-items: center"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg></button>
+<a href="#how" onClick="{{closeMenu}}" class="ppn-item" style="--d: 100ms; font-size: 24px; font-weight: 400; letter-spacing: -.01em; text-decoration: none; color: #121A15">How it works</a>
+<a href="#checks" onClick="{{closeMenu}}" class="ppn-item" style="--d: 200ms; font-size: 24px; font-weight: 400; letter-spacing: -.01em; text-decoration: none; color: #121A15">Photo checks</a>
+<a href="#pricing" onClick="{{closeMenu}}" class="ppn-item" style="--d: 300ms; font-size: 24px; font-weight: 400; letter-spacing: -.01em; text-decoration: none; color: #121A15">Pricing</a>
+<a href="#faq" onClick="{{closeMenu}}" class="ppn-item" style="--d: 400ms; font-size: 24px; font-weight: 400; letter-spacing: -.01em; text-decoration: none; color: #121A15">FAQ</a>
+<a href="https://apps.shopify.com/reklamation" onClick="{{closeMenu}}" class="ppn-item" style="--d: 500ms; margin-top: 16px; display: flex; align-items: center; justify-content: center; height: 52px; border-radius: 999px; background: #14231A; color: #fff; text-decoration: none; font-size: 16px; font-weight: 500">Add to Shopify</a>
+</div>
+</sc-if>
+</header>
+
+<!-- HERO -->
+<div style="position: relative; padding-bottom: 40px">
+<div class="ppv-bg" ref="{{heroRef}}" aria-hidden="true"><canvas class="ppv-canvas"></canvas></div>
+<section id="top" ref="{{scrollRef}}" style="position: relative; z-index: 1; max-width: 1200px; margin: 0 auto; padding: 168px 24px 0; perspective: 1000px">
+<div class="ppx-head" style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 22px; max-width: 860px; margin: 0 auto; will-change: transform">
+<a href="#approve" class="ppx-pill" style="display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 24px; border: 1.5px solid rgba(255,255,255,.16); background: linear-gradient(to top right, rgba(255,255,255,.12), rgba(169,214,188,.12), rgba(255,255,255,0)); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); font-size: 14px; color: rgba(255,255,255,.84); text-decoration: none">Claims for Shopify, without the email<svg class="ppx-chev" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<h1 style="margin: 0; font-size: clamp(42px, 6.4vw, 84px); line-height: 1.02; font-weight: 400; letter-spacing: -.04em; color: transparent; background: linear-gradient(180deg, #FFFFFF 0%, rgba(255,255,255,.74) 100%); -webkit-background-clip: text; background-clip: text">Resolve every claim <span style="color: transparent; background: linear-gradient(90deg, #CFEBDC 0%, #8FD3AE 50%, #5FCB8F 100%); -webkit-background-clip: text; background-clip: text">with one click.</span></h1>
+<p style="margin: 0; max-width: 620px; font-size: 18.5px; line-height: 1.55; color: rgba(255,255,255,.8)">Claims come in through your store, not your inbox. Pick a replacement, gift card or refund, press approve, and PixelProof handles it in Shopify and emails the customer. Every photo is checked for fraud before you decide.</p>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 14px; margin-top: 6px">
+<span style="position: relative; display: inline-block; overflow: hidden; border-radius: 999px; padding: 1.5px">
+<span class="ppx-spin" aria-hidden="true" style="position: absolute; inset: -1000%; background: conic-gradient(from 90deg at 50% 50%, #CFEBDC 0%, #18844F 50%, #CFEBDC 100%)"></span>
+<a href="https://apps.shopify.com/reklamation" class="ppx-cta" style="position: relative; display: inline-flex; align-items: center; gap: 8px; padding: 16px 38px; border-radius: 999px; background: linear-gradient(to top right, rgba(205,210,203,.2), rgba(63,191,122,.16), rgba(255,255,255,0)), #fff; color: #121A15; text-decoration: none; font-weight: 500; font-size: 16px">Start free trial<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+</span>
+<span style="font-size: 13.5px; color: rgba(255,255,255,.72)">7 days free. No credit card. <a href="#how" class="ppv-link" style="color: #fff; font-weight: 500; text-underline-offset: 3px">See how it works</a></span>
+</div>
+</div>
+
+<!-- Product shot: the merchant dashboard -->
+<div class="ppx-shot" style="margin-top: 80px; background: #F7F8F6; border-radius: 28px; padding: 12px; transform-origin: 50% 0%; will-change: transform; box-shadow: 0 9px 20px rgba(6,20,13,.18), 0 37px 37px rgba(6,20,13,.14), 0 84px 50px rgba(6,20,13,.08), 0 149px 60px rgba(6,20,13,.03), 0 1px 2px rgba(18,26,21,.06)">
+<div style="display: flex; background: #ECEDEA; border-radius: 20px; overflow: hidden; text-align: left">
+<aside class="pp-side" aria-hidden="true" style="flex: 0 0 214px; padding: 18px 12px 14px; display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 9px; padding: 2px 4px"><span style="width: 28px; height: 28px; border-radius: 9px; background: #1A3C2A; color: #fff; display: grid; place-items: center"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"></path><path d="M8.5 12l2.5 2.5 4.5-5"></path></svg></span><b style="font-weight: 600; font-size: 15.5px">PixelProof</b></div>
+<div style="display: flex; align-items: center; gap: 8px; height: 34px; padding: 0 10px; border-radius: 10px; background: #fff; color: #5F6862; font-size: 12.5px; box-shadow: 0 1px 2px rgba(18,26,21,.04)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg><span style="flex: 1">Search claims</span><span style="font-size: 10.5px; background: #EBEDE8; border-radius: 5px; padding: 1px 5px">⌘K</span></div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; background: #14231A; color: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 2px 8px rgba(20,35,26,.18)"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="4" width="7" height="7" rx="1.5"></rect><rect x="13" y="4" width="7" height="7" rx="1.5"></rect><rect x="4" y="13" width="7" height="7" rx="1.5"></rect><rect x="13" y="13" width="7" height="7" rx="1.5"></rect></svg>Dashboard</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; color: #4E5852; font-size: 13px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3.5h8l4 4V20a.5.5 0 0 1-.5.5h-11A.5.5 0 0 1 6 20z"></path><path d="M14 3.5v4h4M9 12.5h6M9 16h4"></path></svg>Claims<span style="margin-left: auto; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 20px; background: #E9862A; color: #fff; font-size: 11px; font-weight: 600; display: grid; place-items: center">38</span></div>
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; color: #4E5852; font-size: 13px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 20V11M10 20V5M16 20v-6M3 20.5h18"></path></svg>Analytics</div>
+<div style="font-size: 11px; color: #5F6862; padding: 12px 11px 4px">Setup</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; color: #4E5852; font-size: 13px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4"></path><path d="M5 4h12l-2.5 4L17 12H5"></path></svg>Get started</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; color: #4E5852; font-size: 13px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3v5M15 3v5"></path><path d="M6.5 8h11v3.5a5.5 5.5 0 0 1-11 0z"></path><path d="M12 17v4"></path></svg>Integrations</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; color: #4E5852; font-size: 13px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2.5v2.5M12 19v2.5M4.6 4.6l1.8 1.8M17.6 17.6l1.8 1.8M2.5 12H5M19 12h2.5M4.6 19.4l1.8-1.8M17.6 6.4l1.8-1.8"></path></svg>Settings</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; color: #4E5852; font-size: 13px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="2.5"></rect><path d="M8 9h8M8 13h5"></path></svg>Claim form</div>
+<div style="display: flex; align-items: center; gap: 10px; height: 34px; padding: 0 11px; border-radius: 10px; color: #4E5852; font-size: 13px; font-weight: 500"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .8-1 1.5v.7M12 17v.01"></path></svg>Help</div>
+</div>
+<div style="margin-top: auto; display: flex; align-items: center; gap: 9px; padding: 12px 6px 2px; border-top: 1px solid #E3E6E1"><span style="width: 30px; height: 30px; border-radius: 50%; background: #CFE7DC; color: #1E5A45; display: grid; place-items: center; font-size: 10px; font-weight: 700">YS</span><span style="font-size: 12px; line-height: 1.3"><b style="font-weight: 500; display: block">Your store</b><span style="color: #5F6862">yourstore.myshopify.com</span></span></div>
+</aside>
+
+<div role="img" aria-label="The PixelProof dashboard filled with sample data from a busy store" style="flex: 1 1 auto; min-width: 0; padding: 26px 22px 24px 8px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; flex-wrap: wrap; margin-bottom: 18px">
+<div style="font-size: 32px; line-height: 1.1; font-weight: 400; letter-spacing: -.025em">Dashboard</div>
+<div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center">
+<span style="display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px; border-radius: 11px; background: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 1px 2px rgba(18,26,21,.04)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg>Last 30 days</span>
+<span style="font-size: 12.5px; color: #5F6862; padding: 0 2px">vs previous 30 days</span>
+<span style="display: inline-flex; align-items: center; gap: 7px; height: 34px; padding: 0 12px; border-radius: 11px; background: #fff; font-size: 13px; font-weight: 500; box-shadow: 0 1px 2px rgba(18,26,21,.04)"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"></path></svg>Export</span>
+<span style="display: inline-flex; align-items: center; gap: 6px; height: 34px; padding: 0 13px; border-radius: 11px; background: #14231A; color: #fff; font-size: 13px; font-weight: 500"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 5v14M5 12h14"></path></svg>New claim</span>
+</div>
+</div>
+
+<div class="pps-ov">
+<div class="pps-a" style="background: #fff; border-radius: 18px; padding: 18px">
+<div style="display: flex; justify-content: space-between; align-items: flex-start"><div><div style="font-size: 15px; font-weight: 500">Claims</div><div style="font-size: 12px; color: #5F6862">Last 30 days</div></div><span style="width: 30px; height: 30px; border-radius: 50%; border: 1px solid #E3E6E1; display: grid; place-items: center; color: #4E5852"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></span></div>
+<div style="font-size: 50px; line-height: 1; font-weight: 300; letter-spacing: -.045em; margin-top: 14px">1,284</div>
+<div style="display: flex; align-items: center; gap: 8px; margin-top: 10px"><span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 20px; border: 1px solid #E3E6E1; background: #fff; font-size: 12px; font-weight: 600"><span style="color: #18844F; font-size: 9px">▼</span>96</span><span style="font-size: 12px; color: #5F6862">vs previous 30 days</span></div>
+<div style="margin: 12px 0 0; color: #4E5852; font-size: 12.5px; line-height: 1.45">38 claims are waiting for you. Photo checks flagged 212.</div>
+<div style="display: flex; gap: 3px; height: 10px; border-radius: 6px; overflow: hidden; background: #EBEDE8; margin: 14px 0 6px"><span style="width: 97%; background: #A9D6BC; border-radius: 3px"></span><span style="width: 3%; background: #F5CB8E; border-radius: 3px"></span></div>
+<div style="display: flex; justify-content: space-between; font-size: 11.5px; color: #5F6862; margin-bottom: 4px"><span>1,246 decided</span><span>38 waiting</span></div>
+<div style="display: flex; justify-content: space-between; padding: 9px 0; font-size: 12.5px"><span style="color: #4E5852">Approval rate</span><b style="font-weight: 600">71%</b></div>
+<div style="display: flex; justify-content: space-between; padding: 9px 0; border-top: 1px solid #E3E6E1; font-size: 12.5px"><span style="color: #4E5852">Average claim</span><b style="font-weight: 600">€165</b></div>
+<div style="display: flex; justify-content: space-between; padding: 9px 0 0; border-top: 1px solid #E3E6E1; font-size: 12.5px"><span style="color: #4E5852">Time to decision</span><b style="font-weight: 600">4 h</b></div>
+</div>
+
+<div class="pps-b" style="background: #fff; border-radius: 18px; padding: 18px; display: flex; flex-direction: column">
+<div style="display: flex; justify-content: space-between; align-items: flex-start"><div><div style="font-size: 15px; font-weight: 500">Where the claimed money went</div><div style="font-size: 12px; color: #5F6862">Last 30 days</div></div><span style="font-size: 12.5px; font-weight: 500">Analytics ›</span></div>
+<div style="display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-top: 14px">
+<div><div style="font-size: 12px; color: #5F6862">Money saved</div><div style="font-size: 44px; line-height: 1; font-weight: 300; letter-spacing: -.045em; margin-top: 4px">€49,120</div><div style="display: flex; align-items: center; gap: 8px; margin-top: 10px"><span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 20px; border: 1px solid #E3E6E1; font-size: 12px; font-weight: 600"><span style="color: #18844F; font-size: 9px">▲</span>€8,430</span><span style="font-size: 12px; color: #5F6862">vs previous 30 days</span></div></div>
+<div style="text-align: right"><div style="font-size: 12px; color: #5F6862">Total claimed</div><div style="font-size: 30px; line-height: 1; font-weight: 300; letter-spacing: -.03em; margin-top: 4px">€211,860</div><div style="display: flex; align-items: center; justify-content: flex-end; gap: 8px; margin-top: 8px"><span style="display: inline-flex; align-items: center; gap: 4px; height: 22px; padding: 0 8px; border-radius: 20px; border: 1px solid #E3E6E1; font-size: 12px; font-weight: 600"><span style="color: #18844F; font-size: 9px">▼</span>€12,340</span><span style="font-size: 12px; color: #5F6862">1,284 claims</span></div></div>
+</div>
+<div style="display: flex; gap: 4px; height: 16px; margin: 20px 0 6px"><span style="flex: 134120; background: #2D5BE3; border-radius: 5px"></span><span style="flex: 6270; min-width: 6px; background: #D7810B; border-radius: 5px"></span><span style="flex: 22350; background: #A9D6BC; border-radius: 5px"></span><span style="flex: 49120; background: #18844F; border-radius: 5px"></span></div>
+<div style="display: flex; justify-content: space-between; color: #5F6862; font-size: 11px"><span>€0</span><span>€211,860</span></div>
+<div class="pps-split">
+<div class="pps-row"><span class="pps-sw" style="background: #2D5BE3"></span><div class="pps-v"><b>€134,120</b><small>63%, 886 claims</small></div><div class="pps-l"><b>Paid out</b><small>Replacements, gift cards, refunds</small></div></div>
+<div class="pps-row"><span class="pps-sw" style="background: #D7810B"></span><div class="pps-v"><b>€6,270</b><small>3%, 38 claims</small></div><div class="pps-l"><b>Waiting for a decision</b><small>Not decided yet</small></div></div>
+<div class="pps-row"><span class="pps-sw" style="background: #A9D6BC"></span><div class="pps-v"><b>€22,350</b><small>11%, 148 claims</small></div><div class="pps-l"><b>Rejected for other reasons</b><small>Outside the window or not covered</small></div></div>
+<div class="pps-row"><span class="pps-sw" style="background: #18844F"></span><div class="pps-v"><b style="color: #18844F">€49,120</b><small>23%, 212 claims</small></div><div class="pps-l"><b>Blocked by PixelProof</b><small>Rejected after a failed photo check</small></div></div>
+</div>
+</div>
+
+<div class="pps-c" style="border-radius: 18px; padding: 18px; color: #fff; display: flex; flex-direction: column; min-height: 280px; background: radial-gradient(90% 80% at 0% 0%, #0B2418 0%, rgba(11,36,24,0) 70%), linear-gradient(158deg, #0F2D1E 0%, #1C553A 50%, #4F8A68 100%)">
+<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px"><span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 20px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24); font-size: 12px; font-weight: 500"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"><path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8z"></path></svg>Pattern found</span><span style="font-size: 12px; color: rgba(255,255,255,.8)">‹ 1 of 3 ›</span></div>
+<div style="display: flex; align-items: flex-end; gap: 10px; margin-bottom: 12px"><b style="font-size: 44px; line-height: 1; font-weight: 300; letter-spacing: -.04em">€18,640</b><span style="font-size: 12px; line-height: 1.3; color: rgba(255,255,255,.78); max-width: 15ch; padding-bottom: 3px">claimed with photos found online</span></div>
+<div style="font-size: 19px; font-weight: 500; letter-spacing: -.015em; line-height: 1.2">Photos copied from the web</div>
+<div style="font-size: 12.5px; color: rgba(255,255,255,.82); margin-top: 6px">112 claims in this period used images that already exist online. All were rejected.</div>
+<span style="margin-top: auto; align-self: flex-start; display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px; border-radius: 10px; background: #fff; color: #121A15; font-size: 12.5px; font-weight: 500">Review 112 claims ›</span>
+</div>
+
+<div class="pps-d" style="background: #fff; border-radius: 18px; padding: 18px">
+<div style="display: flex; justify-content: space-between; align-items: baseline"><div style="font-size: 15px; font-weight: 500">Last 12 weeks</div><span style="font-size: 12px; color: #5F6862">Claims per week</span></div>
+<div style="position: relative; height: 150px; display: flex; align-items: flex-end; gap: 5px; padding-top: 18px">
+<div style="position: absolute; left: 0; right: 0; bottom: 110px; border-top: 1.5px dashed #9AA19C; z-index: 1"><span style="position: absolute; right: 0; top: -19px; font-size: 11px; color: #4E5852; background: #fff; padding-left: 6px">Average 323</span></div>
+<span style="flex: 1; height: 120px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 115px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 122px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 116px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 109px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 113px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 111px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 103px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 108px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 101px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 102px; background: #A9D6BC; border-radius: 4px 4px 2px 2px"></span><span style="flex: 1; height: 97px; background: #18844F; border-radius: 4px 4px 2px 2px"></span>
+</div>
+<div style="display: flex; justify-content: space-between; color: #5F6862; font-size: 11px; margin-top: 8px"><span>3 Aug</span><span>This week, 284</span></div>
+</div>
+
+<div class="pps-e" style="background: #fff; border-radius: 18px; padding: 18px">
+<div style="font-size: 15px; font-weight: 500">Needs you</div>
+<div style="font-size: 12px; color: #5F6862; margin-bottom: 6px">3 things right now</div>
+<div style="display: flex; gap: 11px; align-items: center; padding: 10px 0"><span style="width: 32px; height: 32px; border-radius: 50%; background: #FDF1DF; color: #9A5B00; display: grid; place-items: center; flex: none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span><span style="font-size: 12.5px; line-height: 1.3; flex: 1"><b style="font-weight: 500; display: block; font-size: 13px">38 claims waiting for you</b><span style="color: #5F6862">The oldest arrived 2 days ago</span></span></div>
+<div style="display: flex; gap: 11px; align-items: center; padding: 10px 0; border-top: 1px solid #E3E6E1"><span style="width: 32px; height: 32px; border-radius: 50%; background: #FCE8F0; color: #B81D5D; display: grid; place-items: center; flex: none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"></path><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"></path></svg></span><span style="font-size: 12.5px; line-height: 1.3; flex: 1"><b style="font-weight: 500; display: block; font-size: 13px">9 flagged claims to decide</b><span style="color: #5F6862">€3,940 at stake</span></span></div>
+<div style="display: flex; gap: 11px; align-items: center; padding: 10px 0; border-top: 1px solid #E3E6E1"><span style="width: 32px; height: 32px; border-radius: 50%; background: #EBEDE8; color: #4E5852; display: grid; place-items: center; flex: none"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h11v10H3zM14 10h4l3 3v3h-7"></path><circle cx="7" cy="17.5" r="1.8"></circle><circle cx="17" cy="17.5" r="1.8"></circle></svg></span><span style="font-size: 12.5px; line-height: 1.3; flex: 1"><b style="font-weight: 500; display: block; font-size: 13px">Connect Shipmondo</b><span style="color: #5F6862">Create return labels from a claim</span></span></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<p style="margin: 14px 0 0; text-align: center; font-size: 12.5px; color: #5F6862">The merchant dashboard, shown with sample data from a busy store.</p>
+</section>
+</div>
+
+<!-- ONE CLICK TO RESOLVE: the real approve window -->
+<section id="approve" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div class="ppa-grid">
+<div class="ppa-copy">
+<span class="ppa-eyebrow"><span class="ppa-dot"></span>The approve window, straight from the app</span>
+<h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1.05; font-weight: 400; letter-spacing: -.03em"><span style="color: #747D77">One button.</span> Replacement, gift card or refund.</h2>
+<p style="margin: 0; color: #4E5852; font-size: 16.5px; max-width: 460px">Pick how to resolve the claim and press Approve claim. PixelProof sends it out through Shopify and emails the customer for you. No email threads, no extra steps in Shopify.</p>
+<div class="ppa-opts" role="group" aria-label="Show the approve window for a resolution">
+<button type="button" class="ppa-opt" aria-pressed="{{rp0}}" onClick="{{pickRep}}"><span class="ppa-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8l-9-5-9 5 9 5 9-5z"></path><path d="M3 8v8l9 5 9-5V8"></path><path d="M12 13v8"></path></svg></span><span><b>Replacement</b><small>A new order is created in Shopify. A return label is optional.</small></span></button>
+<button type="button" class="ppa-opt" aria-pressed="{{rp1}}" onClick="{{pickGift}}"><span class="ppa-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="13" rx="2"></rect><path d="M3 12h18M12 8v13"></path><path d="M12 8c-1.5-3-5-3.5-5-1.2C7 8 9 8 12 8zM12 8c1.5-3 5-3.5 5-1.2C17 8 15 8 12 8z"></path></svg></span><span><b>Gift card</b><small>Store credit for the full value, emailed to the customer.</small></span></button>
+<button type="button" class="ppa-opt" aria-pressed="{{rp2}}" onClick="{{pickRefund}}"><span class="ppa-ic"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14L4 9l5-5"></path><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"></path></svg></span><span><b>Refund</b><small>Back to the card or account they paid with.</small></span></button>
+</div>
+</div>
+<div class="ppa-stage">
+<img class="ppa-bg" src="./assets/0f6aa6f5f6d04ad985651019d02ee7f0.webp" alt="">
+<div class="ppa-scrim" aria-hidden="true"></div>
+<div class="ppa-modal">
+<img src="./assets/2f2b6277278b612b0f1fcba80aecbce8.webp" alt="{{ma0}}" style="opacity: {{mo0}}">
+<img src="./assets/d08b9302755ca2e75e635bf56c1c9ab5.webp" alt="{{ma1}}" style="opacity: {{mo1}}">
+<img src="./assets/f90bd4ece424bfd7df28a279bf61ab91.webp" alt="{{ma2}}" style="opacity: {{mo2}}">
+</div>
+</div>
+</div>
+</section>
+
+<!-- ONE PLACE, NOT THE INBOX -->
+<section id="inbox" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 32px">
+<h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1.05; font-weight: 400; letter-spacing: -.03em; max-width: 640px"><span style="color: #747D77">Claims out of your inbox.</span> Into one place.</h2>
+<p style="margin: 0; max-width: 420px; color: #4E5852; font-size: 16.5px">No more chasing order numbers and photos over email. The claim form collects everything up front, and you handle every claim from start to finish in the app.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 14px">
+
+<article style="background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 4px"><h3 style="margin: 0; font-size: 19px; font-weight: 500; letter-spacing: -.01em">Without PixelProof</h3><span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 20px; background: #FCE8F0; color: #9B1B52; font-size: 12px; font-weight: 500; white-space: nowrap"><span style="width: 7px; height: 7px; border-radius: 50%; background: #D9246F"></span>7 emails, 4 days</span></div>
+<p style="margin: 0 0 18px; color: #4E5852; font-size: 14.5px">One broken lamp, one customer, one thread in your inbox.</p>
+<div aria-hidden="true" style="margin-top: auto; background: #F4F5F2; border-radius: 14px; padding: 4px 14px">
+<div class="ppi-mail"><span class="ppi-who">Oskar B.</span><span class="ppi-txt">My lamp arrived broken. Can I get a new one?</span><span class="ppi-t">Mon 09:14</span></div>
+<div class="ppi-mail"><span class="ppi-who ppi-you">You</span><span class="ppi-txt">Sorry to hear that. Could you send your order number and a photo?</span><span class="ppi-t">Mon 11:02</span></div>
+<div class="ppi-mail"><span class="ppi-who">Oskar B.</span><span class="ppi-txt">I think it was 5172. Photo attached.</span><span class="ppi-t">Mon 18:40</span></div>
+<div class="ppi-mail"><span class="ppi-who ppi-you">You</span><span class="ppi-txt">Thanks. The photo is quite dark, could you take one of the base?</span><span class="ppi-t">Tue 10:15</span></div>
+<div class="ppi-mail"><span class="ppi-who">Oskar B.</span><span class="ppi-txt">Here you go.</span><span class="ppi-t">Wed 08:51</span></div>
+<div class="ppi-mail"><span class="ppi-who ppi-you">You</span><span class="ppi-txt">Would you like a replacement or a refund?</span><span class="ppi-t">Wed 09:30</span></div>
+<div class="ppi-mail"><span class="ppi-who" style="font-weight: 600">Oskar B.<span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #2D5BE3; margin-left: 6px; vertical-align: 1px"></span></span><span class="ppi-txt" style="color: #121A15">A replacement please.</span><span class="ppi-t">Thu 14:05</span></div>
+</div>
+<p style="margin: 14px 2px 0; color: #5F6862; font-size: 13px">And the replacement order still has to be made by hand in Shopify.</p>
+</article>
+
+<article style="background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 4px"><h3 style="margin: 0; font-size: 19px; font-weight: 500; letter-spacing: -.01em">With PixelProof</h3><span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 20px; background: #E4F3EA; color: #14633B; font-size: 12px; font-weight: 500; white-space: nowrap"><span style="width: 7px; height: 7px; border-radius: 50%; background: #18844F"></span>1 claim, decided in a minute</span></div>
+<p style="margin: 0 0 18px; color: #4E5852; font-size: 14.5px">The same claim arrives complete. You decide on one page.</p>
+<div aria-hidden="true" style="margin-top: auto; background: #F4F5F2; border-radius: 14px; padding: 12px">
+<div style="background: #fff; border-radius: 12px; padding: 14px">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px"><span style="font-size: 14px; font-weight: 500">Claim #1057</span><span style="display: inline-flex; align-items: center; gap: 6px; height: 24px; padding: 0 9px; border-radius: 20px; border: 1px solid #E3E6E1; font-size: 11.5px; font-weight: 500"><span style="width: 7px; height: 7px; border-radius: 50%; background: #18844F"></span>Verified</span></div>
+<div style="font-size: 12px; color: #5F6862; margin-top: 2px">Oskar B., order #5172, 2 h ago</div>
+<div style="display: flex; align-items: center; gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #E3E6E1">
+<span style="display: flex; gap: 6px; flex: none">
+<svg width="46" height="46" viewBox="0 0 100 100" style="border-radius: 8px; display: block"><rect width="100" height="100" fill="#E9E6DF"></rect><rect y="74" width="100" height="26" fill="#CFC7B8"></rect><g transform="rotate(-2 50 60)"><path d="M35 50l8-22h14l8 22z" fill="#E2D6BF"></path><rect x="48" y="50" width="4" height="20" fill="#7a6a52"></rect><rect x="38" y="70" width="24" height="6" rx="2" fill="#7a6a52"></rect><path d="M47 33l3 6-4 5 5 6-2 7" fill="none" stroke="rgba(30,25,20,.75)" stroke-width="1.6" stroke-linejoin="round"></path></g></svg>
+<svg width="46" height="46" viewBox="0 0 100 100" style="border-radius: 8px; display: block"><rect width="100" height="100" fill="#DCD6CB"></rect><rect y="60" width="100" height="40" fill="#BFB6A6"></rect><rect x="22" y="58" width="56" height="14" rx="4" fill="#7a6a52"></rect><path d="M40 60l6 5-3 4 6 3" fill="none" stroke="rgba(30,25,20,.8)" stroke-width="1.8" stroke-linejoin="round"></path></svg>
+<svg width="46" height="46" viewBox="0 0 100 100" style="border-radius: 8px; display: block"><rect width="100" height="100" fill="#D8D2C6"></rect><rect x="16" y="30" width="68" height="50" rx="3" fill="#C2A882"></rect><path d="M16 44h68" stroke="#A88E68" stroke-width="3"></path><rect x="40" y="30" width="20" height="14" fill="#E9E1D2"></rect></svg>
+</span>
+<span style="min-width: 0; flex: 1; font-size: 12px; line-height: 1.35"><b style="display: block; font-size: 13px; font-weight: 500">Table lamp</b><span style="color: #5F6862">Arrived broken, 3 photos</span></span>
+<span style="font-size: 19px; font-weight: 300; letter-spacing: -.02em">€129</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #E3E6E1; font-size: 12px; color: #4E5852">
+<span class="ppi-ok">Taken after delivery</span><span class="ppi-ok">Not found online</span><span class="ppi-ok">Not used in another claim</span><span class="ppi-ok">Unedited</span>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 12px; padding-top: 12px; border-top: 1px solid #E3E6E1">
+<span style="font-size: 12px; color: #5F6862">Customer prefers <b style="color: #121A15; font-weight: 500">Replacement</b></span>
+<span style="display: flex; gap: 6px"><span style="height: 32px; padding: 0 12px; border-radius: 10px; border: 1px solid #E3E6E1; font-size: 12.5px; font-weight: 500; display: inline-flex; align-items: center">Reject</span><span style="height: 32px; padding: 0 12px; border-radius: 10px; background: #14231A; color: #fff; font-size: 12.5px; font-weight: 500; display: inline-flex; align-items: center">Approve replacement</span></span>
+</div>
+</div>
+</div>
+<p style="margin: 14px 2px 0; color: #5F6862; font-size: 13px">Approve, and the replacement order is created in Shopify for you.</p>
+</article>
+
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 24px; margin-top: 28px; padding: 0 4px">
+<div><b style="display: block; font-weight: 500; font-size: 16px; margin-bottom: 4px">Arrives complete</b><span style="color: #4E5852; font-size: 14.5px">Order, items, photos and the customer’s preferred fix come in with the claim. Nothing to ask for.</span></div>
+<div><b style="display: block; font-weight: 500; font-size: 16px; margin-bottom: 4px">Every claim in one list</b><span style="color: #4E5852; font-size: 14.5px">New, waiting and decided claims side by side with their status. Nothing slips through a shared inbox.</span></div>
+<div><b style="display: block; font-weight: 500; font-size: 16px; margin-bottom: 4px">Resolved in the app</b><span style="color: #4E5852; font-size: 14.5px">Replacement, gift card or refund goes out from the claim, and the customer hears back in your brand.</span></div>
+</div>
+</section>
+
+<!-- HOW IT WORKS: the merchant's side, one claim from Needs review to Closed -->
+<section id="how" ref="{{howRef}}" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 32px">
+<h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1.05; font-weight: 400; letter-spacing: -.03em; max-width: 640px"><span style="color: #747D77">A claim comes in.</span> You take it to done.</h2>
+<p style="margin: 0; max-width: 420px; color: #4E5852; font-size: 16.5px">This is PixelProof from your side. Every claim moves through the same statuses, so you always know where it stands.</p>
+</div>
+<div class="pph-grid">
+<ol class="pph-steps">
+<li><button type="button" class="pph-step" aria-pressed="{{sp0}}" onClick="{{go0}}"><span class="pph-n">1</span><span><b>A claim comes in</b><small>It lands at the top of Claims as Needs review, with the order and photos attached.</small></span></button></li>
+<li><button type="button" class="pph-step" aria-pressed="{{sp1}}" onClick="{{go1}}"><span class="pph-n">2</span><span><b>Open it</b><small>Photos, order details and all four photo checks are on one page.</small></span></button></li>
+<li><button type="button" class="pph-step" aria-pressed="{{sp2}}" onClick="{{go2}}"><span class="pph-n">3</span><span><b>Approve in one click</b><small>Pick a resolution and approve. The claim moves to Approved and the customer gets an email.</small></span></button></li>
+<li><button type="button" class="pph-step" aria-pressed="{{sp3}}" onClick="{{go3}}"><span class="pph-n">4</span><span><b>Mark it as done</b><small>The claim moves to Closed, and its full history stays with it.</small></span></button></li>
+</ol>
+<div class="pph-view">
+<div class="pph-track" role="status" aria-label="{{trackLabel}}">
+<span class="pph-st" style="background: {{tb0}}; color: {{tc0}}; border-color: {{tl0}}"><i style="background: {{td0}}"></i>Needs review</span>
+<svg class="pph-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+<span class="pph-st" style="background: {{tb1}}; color: {{tc1}}; border-color: {{tl1}}"><i style="background: {{td1}}"></i>Approved</span>
+<svg class="pph-arr" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg>
+<span class="pph-st" style="background: {{tb2}}; color: {{tc2}}; border-color: {{tl2}}"><i style="background: {{td2}}"></i>Closed</span>
+</div>
+<div class="pph-shot">
+<img src="./assets/932a19761c1c1ebff9582988715a34ca.webp" alt="{{sa0}}" style="opacity: {{so0}}">
+<img src="./assets/0f6aa6f5f6d04ad985651019d02ee7f0.webp" alt="{{sa1}}" style="opacity: {{so1}}">
+<img src="./assets/60741d3aa109ded7fd2bec2d1b4071e7.webp" alt="{{sa2}}" style="opacity: {{so2}}">
+<img src="./assets/c2ec7967fb23e197a0c14c559cf91feb.webp" alt="{{sa3}}" style="opacity: {{so3}}">
+</div>
+<p style="margin: 12px 4px 0; font-size: 12.5px; color: #5F6862">Screens from the PixelProof app, shown with sample data.</p>
+</div>
+</div>
+</section>
+
+<!-- FOUR CHECKS -->
+<section id="checks" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 32px">
+<h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1.05; font-weight: 400; letter-spacing: -.03em; max-width: 640px"><span style="color: #747D77">A photo can look fine.</span> Four checks look closer.</h2>
+<p style="margin: 0; max-width: 400px; color: #4E5852; font-size: 16.5px">Each photo is read for its history, not just what it shows. The result sits next to the claim before you look at it.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px">
+<article style="background: #fff; border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<span style="width: 38px; height: 38px; border-radius: 50%; background: #E4F3EA; color: #18844F; display: grid; place-items: center; margin-bottom: 10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="5" width="16" height="15" rx="2"></rect><path d="M4 10h16M9 3v4M15 3v4"></path></svg></span>
+<h3 style="margin: 0; font-size: 18px; font-weight: 500; letter-spacing: -.01em">Taken after delivery</h3>
+<p style="margin: 0; color: #4E5852; font-size: 14.5px">Compares when the photo was taken with when the parcel arrived.</p>
+<div style="margin-top: auto; padding-top: 14px"><div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #FCE8F0; color: #9B1B52; font-size: 13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Taken 9 days before delivery</div></div>
+</article>
+<article style="background: #fff; border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<span style="width: 38px; height: 38px; border-radius: 50%; background: #E4F3EA; color: #18844F; display: grid; place-items: center; margin-bottom: 10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="M20 20l-3.5-3.5"></path></svg></span>
+<h3 style="margin: 0; font-size: 18px; font-weight: 500; letter-spacing: -.01em">Not found online</h3>
+<p style="margin: 0; color: #4E5852; font-size: 14.5px">Looks for the same image on the web and in stock photo libraries.</p>
+<div style="margin-top: auto; padding-top: 14px"><div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #FCE8F0; color: #9B1B52; font-size: 13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Same image on 4 web pages</div></div>
+</article>
+<article style="background: #fff; border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<span style="width: 38px; height: 38px; border-radius: 50%; background: #E4F3EA; color: #18844F; display: grid; place-items: center; margin-bottom: 10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"></rect><path d="M5 15V5a1 1 0 0 1 1-1h10"></path></svg></span>
+<h3 style="margin: 0; font-size: 18px; font-weight: 500; letter-spacing: -.01em">Not used in another claim</h3>
+<p style="margin: 0; color: #4E5852; font-size: 14.5px">Matches against every photo ever sent to your store.</p>
+<div style="margin-top: auto; padding-top: 14px"><div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #FCE8F0; color: #9B1B52; font-size: 13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Sent before from another email</div></div>
+</article>
+<article style="background: #fff; border-radius: 20px; padding: 22px; display: flex; flex-direction: column; gap: 8px; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<span style="width: 38px; height: 38px; border-radius: 50%; background: #E4F3EA; color: #18844F; display: grid; place-items: center; margin-bottom: 10px"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7" height="7" rx="1.4"></rect><rect x="14" y="3" width="7" height="7" rx="1.4"></rect><rect x="3" y="14" width="7" height="7" rx="1.4"></rect><path d="M14 14h3.2M17.5 14v3.5M14 20.5h3.5M20.5 17.5v3"></path></svg></span>
+<h3 style="margin: 0; font-size: 18px; font-weight: 500; letter-spacing: -.01em">Unedited</h3>
+<p style="margin: 0; color: #4E5852; font-size: 14.5px">Reads the pixels for signs of editing or pasted-in damage.</p>
+<div style="margin-top: auto; padding-top: 14px"><div style="display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 12px; background: #FCE8F0; color: #9B1B52; font-size: 13px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"></path></svg>Crack added in an editing app</div></div>
+</article>
+</div>
+<div style="margin-top: 14px; background: #fff; border-radius: 20px; padding: 18px 22px; display: flex; flex-wrap: wrap; align-items: center; gap: 14px 28px; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<span style="font-size: 14px; font-weight: 500">Every claim gets one of three results</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: #4E5852"><span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 20px; background: #E4F3EA; color: #121A15; font-size: 12.5px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #18844F"></span>Verified</span>All four checks passed</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: #4E5852"><span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 20px; background: #FDF1DF; color: #121A15; font-size: 12.5px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #D7810B"></span>Needs a look</span>One check could not run</span>
+<span style="display: inline-flex; align-items: center; gap: 8px; font-size: 13.5px; color: #4E5852"><span style="display: inline-flex; align-items: center; gap: 6px; height: 26px; padding: 0 10px; border-radius: 20px; background: #FCE8F0; color: #121A15; font-size: 12.5px; font-weight: 500"><span style="width: 6px; height: 6px; border-radius: 50%; background: #D9246F"></span>Flagged</span>A check failed</span>
+</div>
+</section>
+
+<!-- WHAT THE MERCHANT GETS -->
+<section style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 24px; margin-bottom: 32px">
+<h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1.05; font-weight: 400; letter-spacing: -.03em; max-width: 640px"><span style="color: #747D77">Built for the person</span> who makes the call.</h2>
+<p style="margin: 0; max-width: 400px; color: #4E5852; font-size: 16.5px">Installs from the Shopify App Store. Nothing new for your team to learn.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px">
+
+<article style="background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<h3 style="margin: 0; font-size: 19px; font-weight: 500; letter-spacing: -.01em">Opens on what needs you</h3>
+<p style="margin: 6px 0 18px; color: #4E5852; font-size: 14.5px">Waiting claims, flagged claims and setup left to do, in that order.</p>
+<div aria-hidden="true" style="margin-top: auto; background: #F4F5F2; border-radius: 14px; padding: 6px 14px">
+<div style="display: flex; gap: 10px; align-items: center; padding: 10px 0"><span style="width: 30px; height: 30px; border-radius: 50%; background: #FDF1DF; color: #9A5B00; display: grid; place-items: center; flex: none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg></span><span style="font-size: 13px; line-height: 1.3"><b style="font-weight: 500; display: block">4 claims waiting</b><span style="color: #5F6862">The oldest arrived yesterday</span></span></div>
+<div style="display: flex; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #E3E6E1"><span style="width: 30px; height: 30px; border-radius: 50%; background: #FCE8F0; color: #B81D5D; display: grid; place-items: center; flex: none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"></path><path d="M9.5 9.5l5 5M14.5 9.5l-5 5"></path></svg></span><span style="font-size: 13px; line-height: 1.3"><b style="font-weight: 500; display: block">1 flagged claim</b><span style="color: #5F6862">€640 at stake</span></span></div>
+<div style="display: flex; gap: 10px; align-items: center; padding: 10px 0; border-top: 1px solid #E3E6E1"><span style="width: 30px; height: 30px; border-radius: 50%; background: #E8EEFD; color: #2D5BE3; display: grid; place-items: center; flex: none"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"></path><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"></path></svg></span><span style="font-size: 13px; line-height: 1.3"><b style="font-weight: 500; display: block">Add the claim link</b><span style="color: #5F6862">One menu item in Shopify</span></span></div>
+</div>
+</article>
+
+<article style="background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<h3 style="margin: 0; font-size: 19px; font-weight: 500; letter-spacing: -.01em">Your brand on the form</h3>
+<p style="margin: 6px 0 18px; color: #4E5852; font-size: 14.5px">Your logo and colour on the claim form and every email. In English and Svenska.</p>
+<div aria-hidden="true" style="margin-top: auto; display: grid; grid-template-columns: 42% 1fr; border-radius: 14px; overflow: hidden; background: #F4F5F2; min-height: 196px">
+<div style="padding: 14px; color: #fff; display: flex; flex-direction: column; gap: 10px; background: linear-gradient(165deg, #0E2418 0%, #1A3C2A 50%, #5E7A69 100%)">
+<span style="display: flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 600"><span style="width: 20px; height: 20px; border-radius: 6px; background: #fff"></span>Your store</span>
+<span style="font-size: 14px; line-height: 1.2">Report a problem with your order</span>
+<span style="display: flex; flex-direction: column; gap: 4px; font-size: 11px; color: rgba(255,255,255,.75)"><span style="background: rgba(255,255,255,.16); border-radius: 6px; padding: 3px 6px; color: #fff">1 Find your order</span><span style="padding: 0 6px">2 Choose items</span><span style="padding: 0 6px">3 Describe the problem</span><span style="padding: 0 6px">4 Review and send</span></span>
+</div>
+<div style="padding: 14px; display: flex; flex-direction: column; gap: 8px; background: #fff">
+<span style="font-size: 13px">Find your order</span>
+<span style="height: 30px; border-radius: 8px; background: #F4F5F2; font-size: 11.5px; color: #5F6862; display: flex; align-items: center; padding: 0 10px"># 5172</span>
+<span style="height: 30px; border-radius: 8px; background: #F4F5F2; font-size: 11.5px; color: #5F6862; display: flex; align-items: center; padding: 0 10px">you@email.com</span>
+<span style="margin-top: auto; align-self: flex-end; height: 30px; border-radius: 9px; background: #1A3C2A; color: #fff; font-size: 11.5px; font-weight: 500; display: flex; align-items: center; padding: 0 12px">Find my order</span>
+</div>
+</div>
+</article>
+
+</div>
+</section>
+
+<!-- PRICING -->
+<section id="pricing" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div style="display: flex; flex-direction: column; align-items: center; text-align: center; gap: 14px; margin-bottom: 28px">
+<h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1.05; font-weight: 400; letter-spacing: -.03em"><span style="color: #747D77">Pricing that</span> pays for itself.</h2>
+<p style="margin: 0; color: #4E5852; font-size: 16.5px; max-width: 520px">Block one fake claim and the month is usually covered. Every plan starts with 7 days free.</p>
+<div role="group" aria-label="Billing period" style="display: inline-flex; gap: 2px; background: #E2E5DF; border-radius: 12px; padding: 3px; margin-top: 8px">
+<button type="button" onClick="{{setMonthly}}" aria-pressed="{{monthlyPressed}}" style="border: 0; height: 36px; padding: 0 18px; border-radius: 9px; font: inherit; font-weight: 500; font-size: 14px; cursor: pointer; background: {{monthlyBg}}; color: {{monthlyColor}}; box-shadow: {{monthlyShadow}}">Monthly</button>
+<button type="button" onClick="{{setYearly}}" aria-pressed="{{yearlyPressed}}" style="border: 0; height: 36px; padding: 0 18px; border-radius: 9px; font: inherit; font-weight: 500; font-size: 14px; cursor: pointer; background: {{yearlyBg}}; color: {{yearlyColor}}; box-shadow: {{yearlyShadow}}">Yearly<span style="margin-left: 6px; font-size: 12px; color: #18844F">up to 25% off</span></button>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 14px; align-items: stretch">
+
+<article style="background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<h3 style="margin: 0; font-size: 18px; font-weight: 500">Essential</h3>
+<p style="margin: 4px 0 18px; color: #5F6862; font-size: 13.5px; min-height: 40px">For stores seeing their first suspicious claims.</p>
+<div style="display: flex; align-items: baseline; gap: 2px"><span style="font-size: 22px; font-weight: 300">$</span><span style="font-size: 52px; line-height: 1; font-weight: 300; letter-spacing: -.045em">{{p1}}</span><span style="font-size: 14px; color: #5F6862; margin-left: 4px">/month</span></div>
+<div style="font-size: 12.5px; color: #5F6862; min-height: 20px; margin: 6px 0 18px">{{n1}}</div>
+<a href="https://apps.shopify.com/reklamation" style="display: flex; align-items: center; justify-content: center; height: 44px; border-radius: 12px; background: #EBEDE8; color: #121A15; text-decoration: none; font-weight: 500">Start free trial</a>
+<ul style="list-style: none; margin: 22px 0 0; padding: 18px 0 0; border-top: 1px solid #E3E6E1; display: grid; gap: 10px; font-size: 13.5px; color: #4E5852">
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>50 checked claims a month</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Branded claim form</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Four photo checks</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Email support</li>
+</ul>
+</article>
+
+<article style="background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<h3 style="margin: 0; font-size: 18px; font-weight: 500">Premium</h3>
+<p style="margin: 4px 0 18px; color: #5F6862; font-size: 13.5px; min-height: 40px">For growing stores with steady return volume.</p>
+<div style="display: flex; align-items: baseline; gap: 2px"><span style="font-size: 22px; font-weight: 300">$</span><span style="font-size: 52px; line-height: 1; font-weight: 300; letter-spacing: -.045em">{{p2}}</span><span style="font-size: 14px; color: #5F6862; margin-left: 4px">/month</span></div>
+<div style="font-size: 12.5px; color: #5F6862; min-height: 20px; margin: 6px 0 18px">{{n2}}</div>
+<a href="https://apps.shopify.com/reklamation" style="display: flex; align-items: center; justify-content: center; height: 44px; border-radius: 12px; background: #EBEDE8; color: #121A15; text-decoration: none; font-weight: 500">Start free trial</a>
+<ul style="list-style: none; margin: 22px 0 0; padding: 18px 0 0; border-top: 1px solid #E3E6E1; display: grid; gap: 10px; font-size: 13.5px; color: #4E5852">
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>200 checked claims a month</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Everything in Essential</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Analytics and patterns</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Priority email support</li>
+</ul>
+</article>
+
+<article style="border-radius: 20px; padding: 24px; display: flex; flex-direction: column; color: #fff; background: radial-gradient(90% 70% at 0% 0%, #0B2418 0%, rgba(11,36,24,0) 70%), linear-gradient(158deg, #0F2D1E 0%, #1C553A 55%, #4F8A68 100%); box-shadow: 0 30px 60px -30px rgba(20,35,26,.5)">
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 8px"><h3 style="margin: 0; font-size: 18px; font-weight: 500">Pro</h3><span style="display: inline-flex; align-items: center; height: 24px; padding: 0 10px; border-radius: 20px; background: rgba(255,255,255,.14); border: 1px solid rgba(255,255,255,.24); font-size: 12px; font-weight: 500">Most popular</span></div>
+<p style="margin: 4px 0 18px; color: rgba(255,255,255,.8); font-size: 13.5px; min-height: 40px">For high-volume stores that lose the most to fraud.</p>
+<div style="display: flex; align-items: baseline; gap: 2px"><span style="font-size: 22px; font-weight: 300">$</span><span style="font-size: 52px; line-height: 1; font-weight: 300; letter-spacing: -.045em">{{p3}}</span><span style="font-size: 14px; color: rgba(255,255,255,.8); margin-left: 4px">/month</span></div>
+<div style="font-size: 12.5px; color: rgba(255,255,255,.8); min-height: 20px; margin: 6px 0 18px">{{n3}}</div>
+<a href="https://apps.shopify.com/reklamation" style="display: flex; align-items: center; justify-content: center; height: 44px; border-radius: 12px; background: #fff; color: #121A15; text-decoration: none; font-weight: 500">Start free trial</a>
+<ul style="list-style: none; margin: 22px 0 0; padding: 18px 0 0; border-top: 1px solid rgba(255,255,255,.2); display: grid; gap: 10px; font-size: 13.5px; color: rgba(255,255,255,.88)">
+<li style="display: flex; gap: 8px"><span style="color: #A9D6BC">✓</span>1,000 checked claims a month</li>
+<li style="display: flex; gap: 8px"><span style="color: #A9D6BC">✓</span>Everything in Premium</li>
+<li style="display: flex; gap: 8px"><span style="color: #A9D6BC">✓</span>Return labels with Shipmondo</li>
+<li style="display: flex; gap: 8px"><span style="color: #A9D6BC">✓</span>Repeat-claim detection</li>
+</ul>
+</article>
+
+<article style="background: #fff; border-radius: 20px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<h3 style="margin: 0; font-size: 18px; font-weight: 500">Enterprise</h3>
+<p style="margin: 4px 0 18px; color: #5F6862; font-size: 13.5px; min-height: 40px">For large brands that need scale and control.</p>
+<div style="display: flex; align-items: baseline; gap: 2px"><span style="font-size: 22px; font-weight: 300">$</span><span style="font-size: 52px; line-height: 1; font-weight: 300; letter-spacing: -.045em">{{p4}}</span><span style="font-size: 14px; color: #5F6862; margin-left: 4px">/month</span></div>
+<div style="font-size: 12.5px; color: #5F6862; min-height: 20px; margin: 6px 0 18px">{{n4}}</div>
+<a href="https://apps.shopify.com/reklamation" style="display: flex; align-items: center; justify-content: center; height: 44px; border-radius: 12px; background: #EBEDE8; color: #121A15; text-decoration: none; font-weight: 500">Start free trial</a>
+<ul style="list-style: none; margin: 22px 0 0; padding: 18px 0 0; border-top: 1px solid #E3E6E1; display: grid; gap: 10px; font-size: 13.5px; color: #4E5852">
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Unlimited checked claims</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Everything in Pro</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Dedicated success manager</li>
+<li style="display: flex; gap: 8px"><span style="color: #18844F">✓</span>Custom integrations and SLA</li>
+</ul>
+</article>
+
+</div>
+<p style="margin: 18px 0 0; text-align: center; font-size: 12.5px; color: #5F6862">Billed in USD through Shopify, every 30 days or yearly.</p>
+</section>
+
+<!-- FAQ -->
+<section id="faq" style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-start">
+<div style="flex: 1 1 300px; display: flex; flex-direction: column; gap: 14px">
+<h2 style="margin: 0; font-size: clamp(34px, 4.6vw, 54px); line-height: 1.05; font-weight: 400; letter-spacing: -.03em">Questions</h2>
+<p style="margin: 0; color: #4E5852; font-size: 16.5px; max-width: 340px">Anything else, write to us. We usually answer within one working day.</p>
+<a href="mailto:info@pixelproof.io" style="align-self: flex-start; display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 12px; background: #fff; text-decoration: none; font-weight: 500; box-shadow: 0 1px 2px rgba(18,26,21,.06)">info@pixelproof.io</a>
+</div>
+<div style="flex: 2 1 520px; min-width: 0; background: #fff; border-radius: 20px; padding: 8px 22px; box-shadow: 0 1px 2px rgba(18,26,21,.04)">
+<sc-for list="{{faqs}}" as="f" hint-placeholder-count="7">
+<div style="border-top: {{f.border}}">
+<button type="button" onClick="{{f.toggle}}" aria-expanded="{{f.expanded}}" style="width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 18px 0; border: 0; background: none; cursor: pointer; text-align: left; font: inherit; font-size: 16px; font-weight: 500; color: #121A15"><span>{{f.q}}</span><span style="width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; flex: none; transition: transform .25s, background .2s; background: {{f.iconBg}}; color: {{f.iconColor}}; transform: {{f.iconTransform}}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></span></button>
+<sc-if value="{{f.open}}" hint-placeholder-val="{{ false }}">
+<p style="margin: -4px 44px 18px 0; color: #4E5852; line-height: 1.6; font-size: 15px">{{f.a}}</p>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<!-- CTA -->
+<section style="max-width: 1200px; margin: 0 auto; padding: 120px 24px 0">
+<div class="fcb-banner" ref="{{ctaRef}}" role="region" aria-labelledby="final-cta-heading">
+<div class="fcb-blinds" aria-hidden="true" style="background: #06140D"><canvas class="fcb-canvas"></canvas></div>
+<div class="fcb-scrim" aria-hidden="true"></div>
+<div class="fcb-copy">
+<p class="fcb-eyebrow">7 days free, no credit card</p>
+<h2 id="final-cta-heading" class="fcb-heading"><span style="color: rgba(244,247,244,.66)">Your next claim</span> takes one click.</h2>
+<p class="fcb-body">Install from the Shopify App Store and add the claim link to your store menu. Claims stop landing in your inbox, and every photo is checked from the first day.</p>
+<div class="fcb-actions">
+<a href="https://apps.shopify.com/reklamation" class="fcb-primary">Add to Shopify<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a href="#pricing" class="fcb-secondary">See pricing</a>
+</div>
+</div>
+</div>
+</section>
+
+<!-- FOOTER -->
+<footer class="bwf" ref="{{footRef}}" style="margin-top: 120px">
+<div class="bwf-rule" aria-hidden="true"></div>
+<div class="bwf-sky" aria-hidden="true"><canvas class="fcb-canvas"></canvas></div>
+<div class="bwf-scrim" aria-hidden="true"></div>
+<div class="bwf-inner">
+<div class="bwf-col">
+<p class="bwf-label">© 2026 PixelProof</p>
+<div class="bwf-credits">
+<p>Photo checks for Shopify claims. <b>Verify the proof, not the promise.</b></p>
+<p>Questions? Write to <a href="mailto:info@pixelproof.io">info@pixelproof.io</a></p>
+<p class="bwf-legal"><a href="#">Privacy</a><span aria-hidden="true"> · </span><a href="#">Terms</a></p>
+</div>
+</div>
+<nav class="bwf-col" aria-label="Product">
+<p class="bwf-label">Product</p>
+<ul class="bwf-links">
+<li><a class="bwf-link" href="#how"><span class="bwf-link-t">How it works</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 9.5l7-7M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></li>
+<li><a class="bwf-link" href="#checks"><span class="bwf-link-t">Photo checks</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 9.5l7-7M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></li>
+<li><a class="bwf-link" href="#pricing"><span class="bwf-link-t">Pricing</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 9.5l7-7M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></li>
+<li><a class="bwf-link" href="#faq"><span class="bwf-link-t">FAQ</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 9.5l7-7M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></li>
+</ul>
+</nav>
+<nav class="bwf-col" aria-label="Company">
+<p class="bwf-label">Company</p>
+<ul class="bwf-links">
+<li><a class="bwf-link" href="mailto:info@pixelproof.io"><span class="bwf-link-t">Contact</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 9.5l7-7M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></li>
+<li><a class="bwf-link" href="https://apps.shopify.com/reklamation"><span class="bwf-link-t">Shopify App Store</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 9.5l7-7M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></li>
+<li><a class="bwf-link" href="mailto:info@pixelproof.io?subject=PixelProof%20affiliate%20program"><span class="bwf-link-t">Affiliate program</span><svg viewBox="0 0 12 12" aria-hidden="true"><path d="M2.5 9.5l7-7M4 2.5h5.5V8" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></a></li>
+</ul>
+</nav>
+</div>
+<div class="bwf-word">
+<p class="bwf-sr">PixelProof</p>
+<div class="bwf-word-box">
+<div class="bwf-word-in" aria-hidden="true"><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">P</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">i</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">x</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">e</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">l</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">P</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">r</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">o</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">o</span></span><span class="bwf-lw"><span class="bwf-l" onClick="{{hop}}" onAnimationEnd="{{unhop}}">f</span></span></div>
+</div>
+<div class="bwf-foot" aria-hidden="true"></div>
+</div>
+</footer>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":7600}}'>
+class Component extends DCLogic {
+  componentDidMount() { this._startEffects(); }
+  componentDidUpdate() { this._startEffects(); }
+  componentWillUnmount() {
+    if (this._ctaStop) this._ctaStop();
+    if (this._footStop) this._footStop();
+    if (this._howStop) this._howStop();
+    this._howStop = null;
+    if (this._heroStop) this._heroStop();
+    if (this._scrollStop) this._scrollStop();
+    this._scrollStop = null;
+    this._ctaStop = this._footStop = this._heroStop = null;
+  }
+  _startEffects() {
+    if (!this._scrollStop && this._scrollEl) this._scrollStop = this._mountScroll(this._scrollEl) || function () {};
+    if (!this._heroStop && this._heroEl) this._heroStop = this._mountVelaris(this._heroEl, null, 4) || function () {};
+    if (!this._ctaStop && this._ctaEl) this._ctaStop = this._mountVelaris(this._ctaEl, this._ctaEl) || function () {};
+    if (!this._footStop && this._footEl) this._footStop = this._mountFooter(this._footEl) || function () {};
+    if (!this._howStop && this._howEl) this._howStop = this._mountHowAuto(this._howEl) || function () {};
+  }
+
+  /* Hero: the dashboard starts tilted back and flattens as the page scrolls; the headline rises. */
+  _mountScroll(section) {
+    var head = section.querySelector('.ppx-head'), shot = section.querySelector('.ppx-shot');
+    if (!head || !shot) return null;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+    var start = null, raf = 0;
+    var update = function () {
+      raf = 0;
+      var vh = window.innerHeight || 800;
+      var top = shot.getBoundingClientRect().top + (parseFloat(shot.dataset.ty || '0') || 0);
+      if (start === null) start = Math.max(top, vh * 0.12 + 1);
+      var end = vh * 0.12;
+      var p = Math.min(1, Math.max(0, (start - top) / Math.max(1, start - end)));
+      var mobile = window.innerWidth <= 768;
+      var s0 = mobile ? 0.94 : 1.05;
+      shot.style.transform = 'rotateX(' + (20 * (1 - p)).toFixed(2) + 'deg) scale(' + (s0 + (1 - s0) * p).toFixed(4) + ')';
+      head.style.transform = 'translateY(' + (-100 * p).toFixed(1) + 'px)';
+    };
+    var onScroll = function () { if (!raf) raf = requestAnimationFrame(update); };
+    document.addEventListener('scroll', onScroll, { passive: true, capture: true });
+    window.addEventListener('resize', onScroll);
+    update();
+    return function () {
+      cancelAnimationFrame(raf);
+      document.removeEventListener('scroll', onScroll, { capture: true });
+      window.removeEventListener('resize', onScroll);
+      shot.style.transform = ''; head.style.transform = '';
+    };
+  }
+
+  /* Hero background: Velaris, a slow simplex-noise gradient in the brand greens. */
+  /* Living gradient (Velaris). With an events target, it also follows the pointer: a soft swirl and glow under the cursor. */
+  _mountVelaris(container, events, speed) {
+    var canvas = container.querySelector('canvas');
+    if (!canvas) return null;
+    var gl = canvas.getContext('webgl');
+    if (!gl) return null;
+    var VERT = 'attribute vec2 position;varying vec2 vUv;void main(){vUv=position*0.5+0.5;gl_Position=vec4(position,0.0,1.0);}';
+    var FRAG = [
+      'precision highp float;', 'varying vec2 vUv;',
+      'uniform vec2 u_resolution;uniform float u_time;uniform float u_grain;uniform vec3 u_colors[4];uniform vec3 u_bg;uniform vec2 u_mouse;uniform float u_hover;',
+      'vec3 permute(vec3 x){return mod(((x*34.0)+1.0)*x,289.0);}',
+      'float snoise(vec2 v){const vec4 C=vec4(0.211324865405187,0.366025403784439,-0.577350269189626,0.024390243902439);',
+      'vec2 i=floor(v+dot(v,C.yy));vec2 x0=v-i+dot(i,C.xx);vec2 i1=(x0.x>x0.y)?vec2(1.0,0.0):vec2(0.0,1.0);',
+      'vec4 x12=x0.xyxy+C.xxzz;x12.xy-=i1;i=mod(i,289.0);',
+      'vec3 p=permute(permute(i.y+vec3(0.0,i1.y,1.0))+i.x+vec3(0.0,i1.x,1.0));',
+      'vec3 m=max(0.5-vec3(dot(x0,x0),dot(x12.xy,x12.xy),dot(x12.zw,x12.zw)),0.0);m=m*m;m=m*m;',
+      'vec3 x=2.0*fract(p*C.www)-1.0;vec3 h=abs(x)-0.5;vec3 ox=floor(x+0.5);vec3 a0=x-ox;',
+      'm*=1.79284291400159-0.85373472095314*(a0*a0+h*h);',
+      'vec3 g;g.x=a0.x*x0.x+h.x*x0.y;g.yz=a0.yz*x12.xz+h.yz*x12.yw;return 130.0*dot(m,g);}',
+      'void main(){vec2 uv=vUv;float ratio=u_resolution.x/u_resolution.y;vec2 p=uv-0.5;p.x*=ratio;float t=u_time*0.1;',
+      'vec2 m=u_mouse-0.5;m.x*=ratio;vec2 d=p-m;float fall=exp(-dot(d,d)*5.0)*u_hover;',
+      'p+=vec2(-d.y,d.x)*fall*0.55+d*fall*0.25+m*0.08*u_hover;',
+      'float n1=snoise(p*0.4+vec2(t*0.2,-t*0.3));',
+      'float n2=snoise(p*0.55+vec2(-t*0.15,t*0.25)+n1*0.25);',
+      'float n3=snoise(p*0.75+vec2(t*0.1,-t*0.2)+n2*0.2);',
+      'vec3 col=u_bg;float dist=length(vec2((uv.x-0.5)*min(ratio,1.6),uv.y-0.5))*1.5;float vignette=1.0-smoothstep(0.3,1.2,dist);',
+      'col=mix(col,u_colors[0],smoothstep(-0.2,0.5,n1)*0.85);',
+      'col=mix(col,u_colors[1],smoothstep(-0.1,0.6,n2)*0.7);',
+      'col=mix(col,u_colors[2],smoothstep(-0.3,0.4,n3)*0.6);',
+      'col=mix(col,u_colors[3],smoothstep(0.0,0.7,n1*n2)*0.5);',
+      'float glow=smoothstep(0.8,0.0,dist)*0.18;col+=u_colors[1]*glow;',
+      'col=mix(col*0.2,col,vignette);col+=u_colors[1]*fall*0.32;',
+      'float grain=fract(sin(dot(uv,vec2(12.9898,78.233)))*43758.5453+u_time);col+=(grain-0.5)*u_grain*0.1;',
+      'gl_FragColor=vec4(col,1.0);}'
+    ].join('\n');
+    var sh = function (type, src) { var s = gl.createShader(type); gl.shaderSource(s, src); gl.compileShader(s); return gl.getShaderParameter(s, gl.COMPILE_STATUS) ? s : null; };
+    var vs = sh(gl.VERTEX_SHADER, VERT), fs = sh(gl.FRAGMENT_SHADER, FRAG);
+    if (!vs || !fs) return null;
+    var prog = gl.createProgram();
+    gl.attachShader(prog, vs); gl.attachShader(prog, fs); gl.linkProgram(prog);
+    if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) return null;
+    gl.useProgram(prog);
+    var buf = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), gl.STATIC_DRAW);
+    var pos = gl.getAttribLocation(prog, 'position');
+    gl.enableVertexAttribArray(pos);
+    gl.vertexAttribPointer(pos, 2, gl.FLOAT, false, 0, 0);
+    var L = { res: gl.getUniformLocation(prog, 'u_resolution'), time: gl.getUniformLocation(prog, 'u_time'), grain: gl.getUniformLocation(prog, 'u_grain'), colors: gl.getUniformLocation(prog, 'u_colors'), bg: gl.getUniformLocation(prog, 'u_bg'), mouse: gl.getUniformLocation(prog, 'u_mouse'), hover: gl.getUniformLocation(prog, 'u_hover') };
+    var hex = function (h) { var c = h.replace('#', ''); return [parseInt(c.slice(0, 2), 16) / 255, parseInt(c.slice(2, 4), 16) / 255, parseInt(c.slice(4, 6), 16) / 255]; };
+    var colors = new Float32Array([].concat(hex('#1F5C3C'), hex('#18844F'), hex('#0F3A24'), hex('#06140D')));
+    var bg = hex('#06140D');
+    var SPEED = speed || 1.6, GRAIN = 0.3;
+    var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var raf = 0, visible = true, t0 = performance.now();
+    var mx = 0.5, my = 0.5, tx = 0.5, ty = 0.5, hv = 0, th = 0, last = 0;
+    var resize = function () {
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.max(1, Math.round(container.clientWidth * dpr));
+      canvas.height = Math.max(1, Math.round(container.clientHeight * dpr));
+      gl.viewport(0, 0, canvas.width, canvas.height);
+      if (reduce || !visible) draw(reduce ? 40000 : performance.now() - t0);
+    };
+    var draw = function (ms) {
+      gl.uniform2f(L.res, canvas.width, canvas.height);
+      gl.uniform1f(L.time, ms * 0.001 * SPEED);
+      gl.uniform1f(L.grain, GRAIN);
+      gl.uniform3f(L.bg, bg[0], bg[1], bg[2]);
+      gl.uniform3fv(L.colors, colors);
+      gl.uniform2f(L.mouse, mx, my);
+      gl.uniform1f(L.hover, hv);
+      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    };
+    var render = function (now) {
+      raf = 0;
+      var dt = last ? Math.min((now - last) / 1000, 0.1) : 0.016; last = now;
+      var k = 1 - Math.pow(0.0025, dt);
+      mx += (tx - mx) * k; my += (ty - my) * k; hv += (th - hv) * (1 - Math.pow(0.02, dt));
+      draw(now - t0 + 40000);
+      if (visible && !reduce && !document.hidden) raf = requestAnimationFrame(render);
+    };
+    var wake = function () { if (!raf && visible && !reduce && !document.hidden) { last = 0; raf = requestAnimationFrame(render); } };
+    var onMove = function (e) {
+      var r = container.getBoundingClientRect();
+      if (!r.width || !r.height) return;
+      tx = (e.clientX - r.left) / r.width; ty = 1 - (e.clientY - r.top) / r.height; th = 1;
+    };
+    var onLeave = function () { th = 0; };
+    if (events && !reduce) { events.addEventListener('pointermove', onMove); events.addEventListener('pointerleave', onLeave); }
+    var ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(resize) : null;
+    if (ro) ro.observe(container);
+    var io = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(function (e) { visible = e[0].isIntersecting; wake(); }) : null;
+    if (io) io.observe(container);
+    document.addEventListener('visibilitychange', wake);
+    resize();
+    draw(40000);
+    wake();
+    return function () {
+      cancelAnimationFrame(raf);
+      if (ro) ro.disconnect();
+      if (io) io.disconnect();
+      document.removeEventListener('visibilitychange', wake);
+      if (events) { events.removeEventListener('pointermove', onMove); events.removeEventListener('pointerleave', onLeave); }
+      gl.deleteBuffer(buf); gl.deleteProgram(prog);
+    };
+  }
+
+  /* How it works: steps advance on their own while the section is on screen, until the visitor picks one. */
+  _mountHowAuto(el) {
+    var self = this;
+    if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return null;
+    var visible = false;
+    var io = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(function (e) { visible = e[0].isIntersecting; }, { threshold: 0.35 }) : null;
+    if (io) io.observe(el); else visible = true;
+    var timer = setInterval(function () {
+      if (!visible || self._howPicked || document.hidden) return;
+      var st = self.state || {};
+      self.setState({ step: ((st.step || 0) + 1) % 4 });
+    }, 4200);
+    return function () { clearInterval(timer); if (io) io.disconnect(); };
+  }
+
+  /* Footer: a slow diagonal beam that runs behind the columns and through the giant wordmark. */
+  _mountFooter(root) {
+    var inner = root.querySelector('.bwf-word-in'), box = root.querySelector('.bwf-word-box'), word = root.querySelector('.bwf-word');
+    if (!inner || !box || !word) return null;
+    var sky = root.querySelector('.bwf-sky');
+    var blindsStop = sky ? this._mountVelaris(sky, root) : null;
+    var CUT = 0.14;
+    var clamp = function (v, lo, hi) { return v < lo ? lo : v > hi ? hi : v; };
+    var approach = function (from, to, k, dt) { return to + (from - to) * Math.pow(1 - clamp(k, 0, 1), clamp(dt, 0, 0.1) * 60); };
+    var drift = function (t) { return 58 + 9 * (0.7 * Math.sin(t * 0.21) + 0.3 * Math.sin(t * 0.077 + 1.3)); };
+    var place = function () {
+      var r = root.getBoundingClientRect();
+      root.style.setProperty('--bwf-rw', r.width + 'px');
+      root.style.setProperty('--bwf-rh', r.height + 'px');
+      var spans = inner.querySelectorAll('.bwf-l'), top = 0;
+      for (var i = 0; i < spans.length; i++) {
+        var x = 0, y = 0, el = spans[i];
+        while (el && el !== root) { x += el.offsetLeft; y += el.offsetTop; el = el.offsetParent; }
+        spans[i].style.setProperty('--bwf-x', x + 'px');
+        spans[i].style.setProperty('--bwf-y', y + 'px');
+        if (i === 0) top = y;
+      }
+      root.style.setProperty('--bwf-top', top + 'px');
+      root.style.setProperty('--bwf-bot', top + (parseFloat(inner.style.fontSize) || 0) * 0.92 + 'px');
+    };
+    var fit = function () {
+      var pad = parseFloat(getComputedStyle(box).paddingLeft) || 0;
+      var target = box.clientWidth - pad * 2;
+      inner.style.fontSize = '100px';
+      var measured = inner.offsetWidth;
+      var base = 0.8;
+      try {
+        var ctx = document.createElement('canvas').getContext('2d');
+        ctx.font = '500 100px ' + getComputedStyle(inner).fontFamily;
+        var m = ctx.measureText('PixelProof');
+        if (m.fontBoundingBoxAscent > 0) base = clamp(((100 - m.fontBoundingBoxAscent - m.fontBoundingBoxDescent) / 2 + m.fontBoundingBoxAscent) / 100, 0.5, 1.2);
+      } catch (err) {}
+      var size = measured > 0 && target > 0 ? Math.min(100 * target / measured, target * 0.42) : 0;
+      if (size) { inner.style.fontSize = size + 'px'; word.style.height = Math.max(0, size * (base + CUT)) + 'px'; }
+      place();
+    };
+    var ptr = { u: 0.5, x: 0, y: 0, inside: false };
+    var setVars = function (b, px, py, g) {
+      root.style.setProperty('--bwf-b', b.toFixed(2) + '%');
+      root.style.setProperty('--bwf-px', px.toFixed(1) + 'px');
+      root.style.setProperty('--bwf-py', py.toFixed(1) + 'px');
+      root.style.setProperty('--bwf-g', g.toFixed(3));
+    };
+    var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+    var visible = false, raf = 0, last = 0, t = performance.now() / 1000, b = 58, px = 0, py = 0, g = 0;
+    var tick = function (now) {
+      raf = 0;
+      var dt = last ? Math.min(0.1, (now - last) / 1000) : 1 / 60;
+      last = now; t += dt;
+      var idle = drift(t);
+      var target = ptr.inside ? (30 + 52 * clamp(ptr.u, 0, 1)) * 0.75 + idle * 0.25 : idle;
+      b = approach(b, target, 0.035, dt);
+      px = approach(px, ptr.x, 0.16, dt); py = approach(py, ptr.y, 0.16, dt);
+      g = approach(g, ptr.inside ? 1 : 0, 0.06, dt);
+      setVars(b, px, py, g);
+      if (visible && !reduce) raf = requestAnimationFrame(tick);
+    };
+    var start = function () { if (!raf && visible && !reduce) { last = 0; raf = requestAnimationFrame(tick); } };
+    var onPointer = function (e) {
+      var r = root.getBoundingClientRect();
+      ptr.x = e.clientX - r.left; ptr.y = e.clientY - r.top;
+      ptr.u = r.width ? ptr.x / r.width : 0.5;
+      ptr.inside = e.type !== 'pointerleave';
+      if (reduce) setVars(58, ptr.x, ptr.y, ptr.inside ? 1 : 0);
+    };
+    root.addEventListener('pointermove', onPointer, { passive: true });
+    root.addEventListener('pointerenter', onPointer, { passive: true });
+    root.addEventListener('pointerleave', onPointer);
+    var schedule = 0;
+    var ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(function () { cancelAnimationFrame(schedule); schedule = requestAnimationFrame(fit); }) : null;
+    if (ro) ro.observe(root);
+    var io = typeof IntersectionObserver !== 'undefined' ? new IntersectionObserver(function (entries) { visible = entries[0].isIntersecting; if (visible) start(); }, { threshold: 0.05 }) : null;
+    if (io) io.observe(root); else { visible = true; start(); }
+    var alive = true;
+    if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { if (alive) fit(); });
+    fit();
+    return function () {
+      alive = false;
+      if (blindsStop) blindsStop();
+      cancelAnimationFrame(raf); cancelAnimationFrame(schedule);
+      if (ro) ro.disconnect();
+      if (io) io.disconnect();
+      root.removeEventListener('pointermove', onPointer);
+      root.removeEventListener('pointerenter', onPointer);
+      root.removeEventListener('pointerleave', onPointer);
+    };
+  }
+
+  renderVals() {
+    var s = this.state || {};
+    var self = this;
+    if (!this._ctaRefFn) this._ctaRefFn = function (el) { self._ctaEl = el; if (!el && self._ctaStop) { self._ctaStop(); self._ctaStop = null; } };
+    if (!this._scrollRefFn) this._scrollRefFn = function (el) { self._scrollEl = el; if (!el && self._scrollStop) { self._scrollStop(); self._scrollStop = null; } };
+    if (!this._heroRefFn) this._heroRefFn = function (el) { self._heroEl = el; if (!el && self._heroStop) { self._heroStop(); self._heroStop = null; } };
+    if (!this._footRefFn) this._footRefFn =function (el) { self._footEl = el; if (!el && self._footStop) { self._footStop(); self._footStop = null; } };
+    if (!this._howRefFn) this._howRefFn = function (el) { self._howEl = el; if (!el && self._howStop) { self._howStop(); self._howStop = null; } };
+    var yearly = !!s.yearly;
+    var res = s.res == null ? 1 : s.res;
+    var step = s.step || 0;
+    var stage = step < 2 ? 0 : step - 1;
+    var open = s.open == null ? 0 : s.open;
+    var on = { bg: '#fff', color: '#121A15', shadow: '0 1px 2px rgba(18,26,21,.08)' };
+    var off = { bg: 'transparent', color: '#4E5852', shadow: 'none' };
+    var m = yearly ? off : on, y = yearly ? on : off;
+    var FAQ = [
+      { q: 'Will this slow down genuine customers?', a: 'No. The claim form takes about two minutes and the photo checks run while the customer is still on the page. They never see the checks, only a confirmation and a reference number.' },
+      { q: 'Do I still need to email customers about claims?', a: 'No. The claim form collects the order, the items, the photos and the fix the customer prefers, so there is nothing to ask for. You decide on the claim page, and the replacement, gift card or refund goes out from there.' },
+      { q: 'What do the photo checks look for?', a: 'Four things: whether the photo was taken after the parcel arrived, whether the same image exists online, whether it was sent with another claim in your store, and whether it shows signs of editing. Each claim is marked Verified, Needs a look or Flagged.' },
+      { q: 'What happens to a flagged claim?', a: 'Nothing happens automatically. You see which check failed and what to look for, then decide. Rejecting with "Photo check failed" counts the claim value as blocked in your dashboard.' },
+      { q: 'How does it work with Shopify?', a: 'Install it from the Shopify App Store and add the claim link to your store menu. When you approve, a replacement creates a new order, a gift card is emailed, or a refund goes back to the original payment method.' },
+      { q: 'Which languages does the claim form support?', a: 'English and Svenska. The form can start in the customer’s browser language, and customers can switch at the top.' },
+      { q: 'What does it cost?', a: 'Plans start at $19 a month and every plan opens with 7 days free, no credit card needed.' }
+    ];
+    var faqs = FAQ.map(function (f, i) {
+      var isOpen = open === i;
+      return {
+        q: f.q, a: f.a, open: isOpen, expanded: isOpen ? 'true' : 'false',
+        border: i === 0 ? '0' : '1px solid #E3E6E1',
+        iconBg: isOpen ? '#14231A' : '#EBEDE8', iconColor: isOpen ? '#fff' : '#121A15',
+        iconTransform: isOpen ? 'rotate(45deg)' : 'none',
+        toggle: function () { self.setState({ open: isOpen ? -1 : i }); }
+      };
+    });
+    return {
+      pickRep: function () { self.setState({ res: 0 }); },
+      pickGift: function () { self.setState({ res: 1 }); },
+      pickRefund: function () { self.setState({ res: 2 }); },
+      go0: function () { self._howPicked = true; self.setState({ step: 0 }); },
+      go1: function () { self._howPicked = true; self.setState({ step: 1 }); },
+      go2: function () { self._howPicked = true; self.setState({ step: 2 }); },
+      go3: function () { self._howPicked = true; self.setState({ step: 3 }); },
+      trackLabel: 'Status: ' + ['Needs review', 'Approved', 'Closed'][stage],
+      howRef: this._howRefFn,
+      setMonthly: function () { self.setState({ yearly: false }); },
+      setYearly: function () { self.setState({ yearly: true }); },
+      monthlyPressed: yearly ? 'false' : 'true', yearlyPressed: yearly ? 'true' : 'false',
+      monthlyBg: m.bg, monthlyColor: m.color, monthlyShadow: m.shadow,
+      yearlyBg: y.bg, yearlyColor: y.color, yearlyShadow: y.shadow,
+      p1: yearly ? '17' : '19', n1: yearly ? '$205 billed yearly, save 10%' : 'Billed monthly',
+      p2: yearly ? '42' : '49', n2: yearly ? '$500 billed yearly, save 15%' : 'Billed monthly',
+      p3: yearly ? '159' : '199', n3: yearly ? '$1,910 billed yearly, save 20%' : 'Billed monthly',
+      p4: yearly ? '599' : '799', n4: yearly ? '$7,191 billed yearly, save 25%' : 'Billed monthly',
+      faqs: faqs,
+      rp0: res === 0 ? 'true' : 'false', mo0: res === 0 ? 1 : 0, ma0: res === 0 ? 'The PixelProof approve window for claim 1240 with Replacement selected' : '',
+      rp1: res === 1 ? 'true' : 'false', mo1: res === 1 ? 1 : 0, ma1: res === 1 ? 'The PixelProof approve window for claim 1240 with Gift card selected. Ebba gets a 59 euro gift card by email' : '',
+      rp2: res === 2 ? 'true' : 'false', mo2: res === 2 ? 1 : 0, ma2: res === 2 ? 'The PixelProof approve window for claim 1240 with Refund selected' : '',
+      sp0: step === 0 ? 'true' : 'false', so0: step === 0 ? 1 : 0, sa0: step === 0 ? 'The Claims list in PixelProof, with claim 1240 at the top marked Needs review' : '',
+      sp1: step === 1 ? 'true' : 'false', so1: step === 1 ? 1 : 0, sa1: step === 1 ? 'Claim 1240 open in PixelProof, photos verified, with Reject and Approve buttons' : '',
+      sp2: step === 2 ? 'true' : 'false', so2: step === 2 ? 1 : 0, sa2: step === 2 ? 'Claim 1240 approved with a gift card, with a Mark as done button' : '',
+      sp3: step === 3 ? 'true' : 'false', so3: step === 3 ? 1 : 0, sa3: step === 3 ? 'Claim 1240 closed after the gift card, with the full timeline from order to closed' : '',
+      tb0: stage === 0 ? '#FDF1DF' : '#fff', tc0: stage === 0 ? '#121A15' : '#8B938E', tl0: stage === 0 ? '#FDF1DF' : '#E3E6E1', td0: stage === 0 ? '#D7810B' : '#CDD1CC',
+      tb1: stage === 1 ? '#E8EEFD' : '#fff', tc1: stage === 1 ? '#121A15' : '#8B938E', tl1: stage === 1 ? '#E8EEFD' : '#E3E6E1', td1: stage === 1 ? '#2D5BE3' : '#CDD1CC',
+      tb2: stage === 2 ? '#EEF2FC' : '#fff', tc2: stage === 2 ? '#121A15' : '#8B938E', tl2: stage === 2 ? '#EEF2FC' : '#E3E6E1', td2: stage === 2 ? '#9DB7F2' : '#CDD1CC',
+      menuOpen: !!s.menu,
+      menuExpanded: s.menu ? 'true' : 'false',
+      openMenu: function () { self.setState({ menu: true }); },
+      closeMenu: function () { self.setState({ menu: false }); },
+      ctaRef: this._ctaRefFn,
+      heroRef: this._heroRefFn,
+      scrollRef: this._scrollRefFn,
+      footRef: this._footRefFn,
+      hop: function (e) {
+        var el = e.currentTarget;
+        if (window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        el.classList.remove('is-hop'); void el.offsetWidth; el.classList.add('is-hop');
+      },
+      unhop: function (e) { e.currentTarget.classList.remove('is-hop'); }
+    };
+  }
+}
+</script>
+</body>
+</html>
